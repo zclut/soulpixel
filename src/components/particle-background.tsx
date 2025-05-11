@@ -1,3 +1,5 @@
+"use client"
+
 import { useEffect, useRef } from "react"
 
 export default function ParticleBackground() {
@@ -38,8 +40,6 @@ export default function ParticleBackground() {
       angleSpeed: number
       pulseSpeed: number
       pulseFactor: number
-      trailPoints: { x: number; y: number; size: number; alpha: number }[]
-      clusterId: number | null
       hue: number
       saturation: number
       lightness: number
@@ -61,23 +61,9 @@ export default function ParticleBackground() {
         this.angleSpeed = Math.random() * 0.004 - 0.002
         this.pulseSpeed = Math.random() * 0.02 + 0.01
         this.pulseFactor = Math.random() * Math.PI * 2
-        this.trailPoints = []
-        this.clusterId = Math.random() < 0.7 ? Math.floor(Math.random() * 5) : null
       }
 
       update(time: number) {
-        // Store current position in trail
-        if (this.trailPoints.length > 10) {
-          this.trailPoints.pop()
-        }
-
-        this.trailPoints.unshift({
-          x: this.x,
-          y: this.y,
-          size: this.size,
-          alpha: this.alpha,
-        })
-
         // Update angle for circular motion
         this.angle += this.angleSpeed
 
@@ -121,31 +107,6 @@ export default function ParticleBackground() {
         ctx.beginPath()
         ctx.arc(this.x, this.y, this.size * 4, 0, Math.PI * 2)
         ctx.fill()
-
-        // Draw trail
-        if (this.trailPoints.length > 1) {
-          ctx.beginPath()
-          ctx.moveTo(this.trailPoints[0].x, this.trailPoints[0].y)
-
-          for (let i = 1; i < this.trailPoints.length; i++) {
-            const point = this.trailPoints[i]
-            const prevPoint = this.trailPoints[i - 1]
-
-            // Create a curved line
-            const cpX = (prevPoint.x + point.x) / 2
-            const cpY = (prevPoint.y + point.y) / 2
-
-            ctx.quadraticCurveTo(prevPoint.x, prevPoint.y, cpX, cpY)
-
-            // Fade out the trail
-            const alpha = 0.2 * (1 - i / this.trailPoints.length)
-            ctx.strokeStyle = `hsla(${this.hue}, ${this.saturation}%, ${this.lightness}%, ${alpha})`
-            ctx.lineWidth = point.size * 0.8
-            ctx.stroke()
-            ctx.beginPath()
-            ctx.moveTo(cpX, cpY)
-          }
-        }
       }
     }
 
@@ -221,108 +182,6 @@ export default function ParticleBackground() {
       }
     }
 
-    const drawSoulConnections = () => {
-      // For each cluster, connect particles that belong to it
-      soulClusters.forEach((cluster) => {
-        const clusterParticles = particles.filter((p) => p.clusterId === cluster.id)
-
-        if (clusterParticles.length > 1) {
-          // Create a path connecting particles in this cluster
-          ctx.beginPath()
-
-          // Start from a random particle
-          const startIdx = Math.floor(Math.random() * clusterParticles.length)
-          ctx.moveTo(clusterParticles[startIdx].x, clusterParticles[startIdx].y)
-
-          // Connect to other particles with curved lines
-          for (let i = 0; i < clusterParticles.length; i++) {
-            if (i !== startIdx) {
-              const p = clusterParticles[i]
-              const prevP = i === 0 ? clusterParticles[startIdx] : clusterParticles[i - 1]
-
-              // Control points for curve
-              const cpX1 = prevP.x + (p.x - prevP.x) * 0.3 + Math.sin(time * 0.01) * 20
-              const cpY1 = prevP.y + (p.y - prevP.y) * 0.7 + Math.cos(time * 0.01) * 20
-              const cpX2 = prevP.x + (p.x - prevP.x) * 0.7 + Math.sin(time * 0.01 + 1) * 20
-              const cpY2 = prevP.y + (p.y - prevP.y) * 0.3 + Math.cos(time * 0.01 + 1) * 20
-
-              // Draw bezier curve
-              ctx.bezierCurveTo(cpX1, cpY1, cpX2, cpY2, p.x, p.y)
-            }
-          }
-
-          // Close the path back to the start
-          const firstP = clusterParticles[startIdx]
-          const lastP = clusterParticles[clusterParticles.length - 1]
-          const cpX1 = lastP.x + (firstP.x - lastP.x) * 0.3 + Math.sin(time * 0.01 + 2) * 20
-          const cpY1 = lastP.y + (firstP.y - lastP.y) * 0.7 + Math.cos(time * 0.01 + 2) * 20
-          const cpX2 = lastP.x + (firstP.x - lastP.x) * 0.7 + Math.sin(time * 0.01 + 3) * 20
-          const cpY2 = lastP.y + (firstP.y - lastP.y) * 0.3 + Math.cos(time * 0.01 + 3) * 20
-          ctx.bezierCurveTo(cpX1, cpY1, cpX2, cpY2, firstP.x, firstP.y)
-
-          // Style and stroke
-          ctx.strokeStyle = `hsla(${cluster.hue}, 70%, 50%, 0.05)`
-          ctx.lineWidth = 2
-          ctx.stroke()
-
-          // Fill with gradient
-          const gradient = ctx.createLinearGradient(
-            cluster.x - cluster.radius,
-            cluster.y - cluster.radius,
-            cluster.x + cluster.radius,
-            cluster.y + cluster.radius,
-          )
-          gradient.addColorStop(0, `hsla(${cluster.hue}, 70%, 40%, 0.02)`)
-          gradient.addColorStop(1, `hsla(${cluster.hue}, 70%, 30%, 0.01)`)
-          ctx.fillStyle = gradient
-          ctx.fill()
-        }
-      })
-    }
-
-    const drawSoulWisps = () => {
-      // Draw ethereal wisps connecting some particles
-      for (let i = 0; i < particles.length; i++) {
-        const p1 = particles[i]
-
-        // Only create wisps for some particles
-        if (Math.random() > 0.97) {
-          // Find nearby particles
-          for (let j = 0; j < particles.length; j++) {
-            if (i !== j) {
-              const p2 = particles[j]
-              const dx = p1.x - p2.x
-              const dy = p1.y - p2.y
-              const distance = Math.sqrt(dx * dx + dy * dy)
-
-              if (distance < 150) {
-                // Create a wisp between these particles
-                const gradient = ctx.createLinearGradient(p1.x, p1.y, p2.x, p2.y)
-                gradient.addColorStop(0, `hsla(${p1.hue}, ${p1.saturation}%, ${p1.lightness}%, 0.1)`)
-                gradient.addColorStop(1, `hsla(${p2.hue}, ${p2.saturation}%, ${p2.lightness}%, 0.1)`)
-
-                ctx.strokeStyle = gradient
-                ctx.lineWidth = 1
-
-                // Draw a curved path
-                ctx.beginPath()
-                ctx.moveTo(p1.x, p1.y)
-
-                // Control points for the curve
-                const midX = (p1.x + p2.x) / 2
-                const midY = (p1.y + p2.y) / 2
-                const offset = 30 * Math.sin(time * 0.001 + i)
-
-                ctx.quadraticCurveTo(midX + offset, midY + offset, p2.x, p2.y)
-
-                ctx.stroke()
-              }
-            }
-          }
-        }
-      }
-    }
-
     const animate = () => {
       time++
       ctx.clearRect(0, 0, canvas.width, canvas.height)
@@ -333,17 +192,11 @@ export default function ParticleBackground() {
         cluster.draw(ctx)
       })
 
-      // Draw soul connections
-      drawSoulConnections()
-
       // Update and draw particles
       for (const particle of particles) {
         particle.update(time)
         particle.draw(ctx)
       }
-
-      // Draw ethereal wisps
-      drawSoulWisps()
 
       animationFrameId = requestAnimationFrame(animate)
     }
