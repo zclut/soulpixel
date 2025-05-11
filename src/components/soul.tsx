@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import PixelCanvasComponent from "./pixel-canvas";
+import ColorSelector from "./color-selector";
 
 export default function Soul() {
   const [selectedColor, setSelectedColor] = useState("#ff00ff");
@@ -25,7 +26,11 @@ export default function Soul() {
           <h2 className="text-sm uppercase tracking-wider mb-4 text-gray-500 border-b border-gray-800 pb-2">
             Communication Terminal
           </h2>
-          {/* <ChatInterface /> */}
+          <div>CHAT HERE</div>
+          <ColorSelector
+            selectedColor={selectedColor}
+            onColorChange={setSelectedColor}
+          />
         </div>
       </div>
 
