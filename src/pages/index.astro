@@ -1,0 +1,15 @@
+---
+import '../styles/global.css';
+// Component Imports
+import Button from '../components/Button.astro';
+import Layout from '@/layouts/Layout.astro';
+import LandingPage from '@/components/landing';
+
+// Full Astro Component Syntax:
+// https://docs.astro.build/basics/astro-components/
+---
+
+<Layout>
+	<LandingPage client:load />
+</Layout>
+
