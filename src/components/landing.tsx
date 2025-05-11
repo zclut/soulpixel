@@ -1,27 +1,32 @@
-import { useState, useEffect } from "react"
-import { Button } from "@/components/ui/button"
-import { motion } from "framer-motion"
-import ParticleBackground from "@/components/particle-background"
-import { SignInButton, SignedIn, SignedOut, UserButton } from '@clerk/astro/react'
+import { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import { motion } from "framer-motion";
+import ParticleBackground from "@/components/particle-background";
+import {
+  SignInButton,
+  SignedIn,
+  SignedOut,
+  UserButton,
+} from "@clerk/astro/react";
 
 export default function LandingPage() {
-  const [isTyping, setIsTyping] = useState(true)
-  const [typedText, setTypedText] = useState("")
+  const [isTyping, setIsTyping] = useState(true);
+  const [typedText, setTypedText] = useState("");
   const fullText =
-    "You don't just place a pixel. You leave a trace of who you are.\nAnd something... listens."
+    "You don't just place a pixel. You leave a trace of who you are.\nAnd something... listens.";
 
   useEffect(() => {
     if (isTyping) {
       if (typedText.length < fullText.length) {
         const timeout = setTimeout(() => {
-          setTypedText(fullText.slice(0, typedText.length + 1))
-        }, 70)
-        return () => clearTimeout(timeout)
+          setTypedText(fullText.slice(0, typedText.length + 1));
+        }, 70);
+        return () => clearTimeout(timeout);
       } else {
-        setIsTyping(false)
+        setIsTyping(false);
       }
     }
-  }, [typedText, isTyping])
+  }, [typedText, isTyping]);
 
   return (
     <div className="relative flex flex-col items-center justify-center min-h-screen w-full overflow-hidden bg-gradient-radial from-[#120a1a] via-[#0a0a1a] to-[#050510] text-gray-300">
@@ -82,9 +87,7 @@ export default function LandingPage() {
           <div className="absolute -inset-1 bg-gradient-to-r from-purple-600/30 to-violet-800/30 rounded-lg blur-lg group-hover:opacity-100 transition duration-1000 group-hover:duration-200 animate-pulse"></div>
           <SignedOut>
             <SignInButton mode="modal">
-              <Button
-                className="cursor-pointer relative group font-mono text-lg px-8 py-6 bg-transparent border border-purple-900/50 hover:border-purple-500/50 text-gray-300 hover:text-[#c4a9ff] transition-all duration-300 overflow-hidden"
-              >
+              <Button className="cursor-pointer relative group font-mono text-lg px-8 py-6 bg-transparent border border-purple-900/50 hover:border-purple-500/50 text-gray-300 hover:text-[#c4a9ff] transition-all duration-300 overflow-hidden">
                 <span className="relative z-10">Enter the Soul</span>
                 <span className="absolute inset-0 bg-gradient-to-r from-[#1e1e1e] to-[#2a0a3e] opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
                 <span className="absolute inset-0 bg-[#1a0a2e] opacity-0 group-hover:opacity-30 glitch-effect"></span>
@@ -93,14 +96,20 @@ export default function LandingPage() {
           </SignedOut>
 
           <SignedIn>
-            <UserButton />
+            <a href="/soul">
+              <Button className="cursor-pointer relative group font-mono text-lg px-8 py-6 bg-transparent border border-purple-900/50 hover:border-purple-500/50 text-gray-300 hover:text-[#c4a9ff] transition-all duration-300 overflow-hidden">
+                <span className="relative z-10">Feed the Soul</span>
+                <span className="absolute inset-0 bg-gradient-to-r from-[#1e1e1e] to-[#2a0a3e] opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
+                <span className="absolute inset-0 bg-[#1a0a2e] opacity-0 group-hover:opacity-30 glitch-effect"></span>
+              </Button>
+            </a>
           </SignedIn>
         </motion.div>
       </div>
 
       <div className="absolute bottom-4 left-0 right-0 text-center text-xs text-gray-500 font-mono">
-        <p>PixelDay © {new Date().getFullYear()}</p>
+        <p>SoulPixel © {new Date().getFullYear()}</p>
       </div>
     </div>
-  )
+  );
 }
