@@ -69,7 +69,6 @@ export default function PixelCanvas({ selectedColor }: PixelCanvasProps) {
             display: "grid",
             gridTemplateColumns: `repeat(${gridSize}, 1fr)`,
             gridTemplateRows: `repeat(${gridSize}, 1fr)`,
-            gap: "1px",
             padding: "1px",
             background: "#111",
           }}
@@ -78,11 +77,12 @@ export default function PixelCanvas({ selectedColor }: PixelCanvasProps) {
             row.map((color, colIndex) => (
               <div
                 key={`${rowIndex}-${colIndex}`}
-                className="pixel transition-colors duration-200 hover:opacity-80 cursor-crosshair"
+                className="pixel transition-colors duration-200 hover:opacity-80 cursor-crosshair border-1"
                 style={{
                   backgroundColor: color,
                   boxShadow:
                     color !== "transparent" ? `0 0 8px ${color}` : "none",
+                  aspectRatio: "1 / 1",
                 }}
                 onClick={() => handlePixelClick(rowIndex, colIndex)}
               />
