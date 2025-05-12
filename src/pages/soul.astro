@@ -1,11 +1,14 @@
 ---
 import "../styles/global.css";
 // Component Imports
-import Button from "../components/Button.astro";
 import Layout from "@/layouts/Layout.astro";
 import SoulComponent from "@/components/soul";
+import { getCurrentGrid, listenToGridChanges } from "@/lib/supabase";
+
+const { data, error } = await getCurrentGrid();
+//const newPixel = listenToGridChanges()
 ---
 
 <Layout>
-  <SoulComponent client:load />
+  <SoulComponent initialGrid={data} client:load />
 </Layout>

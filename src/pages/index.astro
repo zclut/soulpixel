@@ -1,14 +1,9 @@
 ---
-import '../styles/global.css';
-import Layout from '@/layouts/Layout.astro';
-import LandingPage from '@/components/landing';
-import { getCurrentGrid } from '@/lib/supabase';
-
-// console.log(await getCurrentGrid())
-
+import "../styles/global.css";
+import Layout from "@/layouts/Layout.astro";
+import LandingPage from "@/components/landing";
 ---
 
 <Layout>
-	<LandingPage client:load />
+  <LandingPage client:load />
 </Layout>
-

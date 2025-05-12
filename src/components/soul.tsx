@@ -2,8 +2,27 @@ import { useEffect, useRef, useState } from "react";
 import PixelCanvasComponent from "./pixel-canvas";
 import ColorSelector from "./color-selector";
 
-export default function Soul() {
+interface Props {
+  initialGrid: any[];
+  newPixel?: any;
+}
+
+export default function Soul({ initialGrid, newPixel }: Props) {
   const [selectedColor, setSelectedColor] = useState("#ff00ff");
+
+  const insertPixel = async (x: number, y: number, color: string) => {
+    await fetch("/api/pixel", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        x,
+        y,
+        color,
+      }),
+    });
+  };
 
   return (
     <div className="relative flex min-h-screen flex-col items-center justify-between bg-black text-gray-300 font-mono overflow-hidden">
@@ -17,7 +36,12 @@ export default function Soul() {
         {/*  Pixel Canvas */}
         <div className="md:w-1/2 flex-1 flex flex-col items-center justify-center">
           <div className="relative w-full h-full mx-auto">
-            <PixelCanvasComponent selectedColor={selectedColor} />
+            <PixelCanvasComponent
+              newPixel={newPixel}
+              initialGrid={initialGrid}
+              selectedColor={selectedColor}
+              onPixelClick={(x, y, color) => insertPixel(x, y, color)}
+            />
           </div>
         </div>
 

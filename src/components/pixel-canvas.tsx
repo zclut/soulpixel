@@ -2,29 +2,62 @@
 
 import { useState, useEffect, useRef } from "react";
 import { Maximize2, Minimize2 } from "lucide-react";
+import { listenToGridChanges } from "@/lib/supabase";
 
 interface PixelCanvasProps {
   selectedColor: string;
+  initialGrid: any[];
+  newPixel: any;
+  onPixelClick?: (x: number, y: number, color: string) => void;
 }
 
-export default function PixelCanvas({ selectedColor }: PixelCanvasProps) {
+export default function PixelCanvas({
+  selectedColor,
+  initialGrid,
+  newPixel,
+  onPixelClick,
+}: PixelCanvasProps) {
   const [grid, setGrid] = useState<string[][]>([]);
   const [gridSize, setGridSize] = useState(64);
   const [isFullscreen, setIsFullscreen] = useState(true);
   const canvasRef = useRef<HTMLDivElement>(null);
 
-  // Initialize grid
+  const handleNewPixel = (newPixel: any) => {
+    const { x, y, color } = newPixel;
+    setGrid((prevGrid) => {
+      // Copia superficial del grid
+      const newGrid = [...prevGrid];
+      // Copia de la fila afectada
+      const newRow = [...newGrid[y]];
+      // Modifica la fila
+      newRow[x] = color;
+      // Asigna la fila modificada al nuevo grid
+      newGrid[y] = newRow;
+      return newGrid;
+    });
+  };
+
+  listenToGridChanges((newPixel: any) => handleNewPixel(newPixel));
+
   useEffect(() => {
     const newGrid = Array(gridSize)
       .fill(null)
       .map(() => Array(gridSize).fill("transparent"));
+    if (initialGrid) {
+      initialGrid.forEach(({ x, y, color }) => {
+        newGrid[y][x] = color;
+      });
+    }
     setGrid(newGrid);
-  }, [gridSize]);
+  }, [gridSize, initialGrid]);
 
   const handlePixelClick = (rowIndex: number, colIndex: number) => {
-    const newGrid = [...grid];
-    newGrid[rowIndex][colIndex] = selectedColor;
-    setGrid(newGrid);
+    // const newGrid = [...grid];
+    // newGrid[rowIndex][colIndex] = selectedColor;
+    // setGrid(newGrid);
+    if (onPixelClick) {
+      onPixelClick(colIndex, rowIndex, selectedColor);
+    }
 
     // Add glitch effect to the canvas
     if (canvasRef.current) {
