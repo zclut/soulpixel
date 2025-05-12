@@ -93,11 +93,11 @@ export default function PixelCanvas({
 
       <div className="relative flex-1 border border-gray-800 rounded-md overflow-hidden bg-black/50">
         {/* Scanlines effect */}
-        <div className="absolute inset-0 pointer-events-none scanlines"></div>
+        <div className="absolute inset-0 pointer-events-none"></div>
 
         {/* Pixel grid */}
         <div
-          className="absolute inset-0 grid"
+          className={`absolute inset-0 grid`}
           style={{
             display: "grid",
             gridTemplateColumns: `repeat(${gridSize}, 1fr)`,
@@ -110,13 +110,13 @@ export default function PixelCanvas({
             row.map((color, colIndex) => (
               <div
                 key={`${rowIndex}-${colIndex}`}
-                className="pixel transition-colors duration-200 hover:opacity-80 cursor-crosshair border-1"
-                style={{
-                  backgroundColor: color,
-                  boxShadow:
-                    color !== "transparent" ? `0 0 8px ${color}` : "none",
-                  aspectRatio: "1 / 1",
-                }}
+                className={`pixel aspect-square transition-colors duration-200 cursor-crosshair border-1`}
+                style={
+                  {
+                    backgroundColor: color,
+                    "--hover-color": selectedColor,
+                  } as React.CSSProperties
+                }
                 onClick={() => handlePixelClick(rowIndex, colIndex)}
               />
             ))
@@ -137,9 +137,9 @@ export default function PixelCanvas({
             -
           </button>
           <button
-            onClick={() => setGridSize(Math.min(32, gridSize + 4))}
+            onClick={() => setGridSize(Math.min(64, gridSize + 4))}
             className="hover:text-purple-500 transition-colors"
-            disabled={gridSize >= 32}
+            disabled={gridSize >= 64}
           >
             +
           </button>
@@ -147,6 +147,9 @@ export default function PixelCanvas({
       </div>
 
       <style>{`
+      .pixel:hover {
+        background-color: var(--hover-color) !important;
+        }
         .scanlines {
           background: linear-gradient(
             to bottom,

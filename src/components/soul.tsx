@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import PixelCanvasComponent from "./pixel-canvas";
 import ColorSelector from "./color-selector";
+import OnlineUsers from "./OnlineUsers";
 
 interface Props {
   initialGrid: any[];
@@ -62,7 +63,7 @@ export default function Soul({ initialGrid, newPixel }: Props) {
         <div className="flex justify-between">
           <span>© 2025 ECHO SYSTEMS</span>
           <span className="text-red-500 animate-pulse">
-            UNAUTHORIZED ACCESS DETECTED
+            <OnlineUsers />
           </span>
         </div>
       </footer>
