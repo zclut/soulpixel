@@ -1,6 +1,7 @@
 import { useState } from "react";
 import PixelCanvasComponent from "@/components/react/PixelCanvas";
 import ColorSelector from "@/components/react/ColorSelector";
+import { insertPixel } from "@/services/api";
 
 interface Props {
   initialGrid: any[];
@@ -8,20 +9,6 @@ interface Props {
 
 export default function Panel({ initialGrid }: Props) {
   const [selectedColor, setSelectedColor] = useState("#ff00ff");
-
-  const insertPixel = async (x: number, y: number, color: string) => {
-    await fetch("/api/pixel", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        x,
-        y,
-        color,
-      }),
-    });
-  };
 
   return (
     <div className="flex flex-col md:flex-row w-full flex-1 p-4 gap-4 z-10">
