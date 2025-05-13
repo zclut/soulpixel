@@ -99,7 +99,7 @@ export default function PixelCanvas({
             gridTemplateColumns: `repeat(${gridSize}, 1fr)`,
             gridTemplateRows: `repeat(${gridSize}, 1fr)`,
             padding: "1px",
-            background: "#111",
+            background: "#333333",
           }}
         >
           {grid.map((row, rowIndex) =>
