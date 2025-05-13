@@ -1,26 +1,24 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
-import ParticleBackground from "@/components/particle-background";
+import ParticleBackground from "@/components/react/ParticleBackground";
 import {
   SignInButton,
   SignedIn,
   SignedOut,
-  UserButton,
 } from "@clerk/astro/react";
 
 export default function LandingPage() {
   const [isTyping, setIsTyping] = useState(true);
   const [typedText, setTypedText] = useState("");
-  const fullText =
-    "You don't just place a pixel. You leave a trace of who you are.\nAnd something... listens.";
+  const fullText = "You don't just place a pixel. You leave a trace of who you are.\nAnd something... listens.";
 
   useEffect(() => {
     if (isTyping) {
       if (typedText.length < fullText.length) {
         const timeout = setTimeout(() => {
           setTypedText(fullText.slice(0, typedText.length + 1));
-        }, 70);
+        }, 60);
         return () => clearTimeout(timeout);
       } else {
         setIsTyping(false);
@@ -81,7 +79,7 @@ export default function LandingPage() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 3, duration: 0.8 }}
+          transition={{ delay: 5, duration: 0.8 }}
           className="relative"
         >
           <div className="absolute -inset-1 bg-gradient-to-r from-purple-600/30 to-violet-800/30 rounded-lg blur-lg group-hover:opacity-100 transition duration-1000 group-hover:duration-200 animate-pulse"></div>

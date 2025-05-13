@@ -1,5 +1,3 @@
-"use client";
-
 import { useState, useEffect, useRef } from "react";
 import { Maximize2, Minimize2 } from "lucide-react";
 import { listenToGridChanges } from "@/lib/supabase";
@@ -7,14 +5,12 @@ import { listenToGridChanges } from "@/lib/supabase";
 interface PixelCanvasProps {
   selectedColor: string;
   initialGrid: any[];
-  newPixel: any;
   onPixelClick?: (x: number, y: number, color: string) => void;
 }
 
 export default function PixelCanvas({
   selectedColor,
   initialGrid,
-  newPixel,
   onPixelClick,
 }: PixelCanvasProps) {
   const [grid, setGrid] = useState<string[][]>([]);
