@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
+import { Activity } from "lucide-react";
 
 export default function OnlineUsers() {
   const [onlineCount, setOnlineCount] = useState(0);
@@ -32,5 +33,10 @@ export default function OnlineUsers() {
     };
   }, []);
 
-  return <div>CONNECTED SOULS: {onlineCount}</div>;
+  return (
+    <div className="flex items-center gap-1">
+      <Activity className="h-5 w-5"/> 
+      CONNECTED SOULS: {onlineCount}
+    </div>
+  );
 }
