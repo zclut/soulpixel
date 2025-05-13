@@ -10,7 +10,7 @@ const Footer = ({ selectedColor, onColorChange }: Props) => {
   const today = new Date();
 
   return (
-    <footer className="w-full py-3 px-6 bg-gray-900">
+    <footer className="w-full py-3 px-6 bg-gray-900/60"> 
       <div className="flex flex-col gap-2 sm:flex-row sm:gap-2 sm:justify-between">
         <ColorSelector
           selectedColor={selectedColor}

@@ -1,8 +1,8 @@
 import { useState } from "react";
 import PixelCanvasComponent from "@/components/react/PixelCanvas";
-import ColorSelector from "@/components/react/ColorSelector";
 import { insertPixel } from "@/services/api";
-import Footer from "../Footer";
+import Footer from "@/components/Footer";
+import Header from '@/components/Header';
 
 interface Props {
   initialGrid: any[];
@@ -13,7 +13,9 @@ export default function Panel({ initialGrid }: Props) {
 
   return (
     <>
-      <div className="flex flex-col md:flex-row w-full flex-1 p-4 gap-4 z-10">
+      <Header />
+
+      <div className="flex flex-col md:flex-row w-full flex-1 gap-4 z-10">
         {/*  Pixel Canvas */}
         <div className="md:w-1/2 flex-1 flex flex-col items-center justify-center">
           <div className="relative w-full h-full mx-auto">
@@ -26,7 +28,7 @@ export default function Panel({ initialGrid }: Props) {
         </div>
 
         {/* Right Panel - Chat */}
-        <div className="md:w-1/4 bg-gray-900/60 backdrop-blur-sm rounded-lg p-4 border border-gray-800">
+        <div className="md:w-1/4 bg-gray-900/60 backdrop-blur-sm rounded-lg p-4"> 
           <h2 className="text-sm uppercase tracking-wider mb-4 text-gray-500 border-b border-gray-800 pb-2">
             Communication Terminal
           </h2>
@@ -34,10 +36,7 @@ export default function Panel({ initialGrid }: Props) {
         </div>
       </div>
 
-      <Footer
-        selectedColor={selectedColor}
-        onColorChange={setSelectedColor}
-      />
+      <Footer selectedColor={selectedColor} onColorChange={setSelectedColor} />
     </>
   );
 }
