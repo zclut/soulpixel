@@ -6,7 +6,7 @@ import { getCurrentGrid, getLeaderboard } from "@/lib/supabase";
 import Panel from "@/components/react/Panel";
 import Header from "@/components/Header.astro";
 
-const { userId } = Astro.locals.auth()
+const { userId } = Astro.locals.auth();
 
 if (!userId) {
   return Astro.redirect("/");
@@ -18,9 +18,7 @@ const { data: initialLeaderboard } = await getLeaderboard();
 ---
 
 <Layout>
-  <div
-    class="min-h-screen bg-black text-purple-500 font-mono flex flex-col"
-  >
+  <div class="min-h-screen bg-black text-purple-500 font-mono flex flex-col">
     <Header />
 
     <Panel 
