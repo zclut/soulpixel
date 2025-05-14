@@ -1,0 +1,25 @@
+---
+import { SignedIn, UserButton } from "@clerk/astro/components";
+import OnlineUsers from "./react/OnlineUsers";
+---
+
+<header
+  class="border-b border-purple-900/50 p-4 flex justify-between items-center"
+>
+  <div class="flex items-center gap-2">
+    <div class="text-xl font-bold tracking-wider glitch-text">SOUL PIXEL</div>
+  </div>
+  <div class="flex items-center gap-4">
+    <div class="flex items-center">
+      <OnlineUsers client:load/>
+    </div>
+    <div
+      class="h-8 w-8 rounded-full bg-gray-800 border border-purple-500 overflow-hidden"
+    >
+      <SignedIn>
+        <UserButton />
+      </SignedIn>
+    </div>
+  </div>
+</header>
+

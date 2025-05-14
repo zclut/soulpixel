@@ -1,38 +1,66 @@
 import { useState } from "react";
-import PixelCanvasComponent from "@/components/react/PixelCanvas";
-import { insertPixel } from "@/services/api";
 import Footer from "@/components/Footer";
-import Header from '@/components/Header';
+import { TerminalIcon } from "lucide-react";
+import PixelCanvas from "@/components/react/PixelCanvas";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface Props {
   initialGrid: any[];
 }
 
 export default function Panel({ initialGrid }: Props) {
-  const [selectedColor, setSelectedColor] = useState("#ffffff");
+  const [selectedColor, setSelectedColor] = useState("#FFFFFF");
 
   return (
     <>
-      <Header />
-
-      <div className="flex flex-col md:flex-row w-full flex-1 gap-4 z-10">
-        {/*  Pixel Canvas */}
-        <div className="md:w-1/2 flex-1 flex flex-col items-center justify-center">
-          <div className="relative w-full h-full mx-auto">
-            <PixelCanvasComponent
-              initialGrid={initialGrid}
-              selectedColor={selectedColor}
-              onPixelClick={(x, y, color) => insertPixel(x, y, color)}
-            />
-          </div>
+      {/* Main Content */}
+      <div className="flex-1 flex flex-col md:flex-row gap-2 p-2">
+        {/*  Left Panel - Canvas */}
+        <div className="flex-1 relative">
+          <PixelCanvas 
+            activeColor={selectedColor}
+            initialGrid={initialGrid}
+          />
         </div>
 
         {/* Right Panel - Chat */}
-        <div className="md:w-1/4 bg-gray-900/60 backdrop-blur-sm rounded-lg p-4"> 
-          <h2 className="text-sm uppercase tracking-wider mb-4 text-gray-500 border-b border-gray-800 pb-2">
-            Communication Terminal
-          </h2>
-          <div>CHAT HERE</div>
+        <div className="w-full md:w-96 flex flex-col gap-2">
+          {/* Terminal Feed */}
+          <div className="border border-purple-900/50 bg-black/80 rounded-sm overflow-hidden flex flex-col">
+            <div className="p-2 border-b border-purple-900/50 flex justify-between items-center">
+              <div className="text-sm tracking-wider flex items-center gap-2">
+                <TerminalIcon className="h-4 w-4" />
+                COMMUNICATION TERMINAL
+              </div>
+            </div>
+            <Tabs defaultValue="feed" className="flex-1 flex flex-col">
+              <TabsList className="bg-black border-b border-purple-900/50 rounded-none h-8 w-full">
+                <TabsTrigger value="feed" className="text-xs h-6 data-[state=active]:bg-purple-900/20">
+                  FEED
+                </TabsTrigger>
+                <TabsTrigger value="leaderboard" className="text-xs h-6 data-[state=active]:bg-purple-900/20">
+                  LEADERBOARD
+                </TabsTrigger>
+                <TabsTrigger value="achievements" className="text-xs h-6 data-[state=active]:bg-purple-900/20">
+                  ACHIEVEMENTS
+                </TabsTrigger>
+              </TabsList>
+              <TabsContent value="feed" className="flex-1 p-0 m-0">
+                {/* <Terminal /> */}
+                Terminal
+              </TabsContent>
+              <TabsContent value="leaderboard" className="flex-1 p-0 m-0">
+                {/* <Leaderboard /> */}
+                Leaderboard
+              </TabsContent>
+              <TabsContent value="achievements" className="flex-1 p-0 m-0">
+                {/* <Achievements /> */}
+                Achievements
+              </TabsContent>
+            </Tabs>
+          </div>
+
+          {/* System */}
         </div>
       </div>
 

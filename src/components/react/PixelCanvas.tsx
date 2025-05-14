@@ -1,195 +1,386 @@
-import { useState, useEffect, useRef } from "react";
-import { Maximize2, Minimize2 } from "lucide-react";
 import { listenToGridChanges } from "@/lib/supabase";
+import { insertPixel } from "@/services/api";
+import type React from "react"
+
+import { useState, useEffect, useRef } from "react"
 
 interface PixelCanvasProps {
-  selectedColor: string;
+  activeColor: string;
   initialGrid: any[];
-  onPixelClick?: (x: number, y: number, color: string) => void;
 }
 
-export default function PixelCanvas({
-  selectedColor,
-  initialGrid,
-  onPixelClick,
-}: PixelCanvasProps) {
-  const [grid, setGrid] = useState<string[][]>([]);
-  const [gridSize, setGridSize] = useState(64);
-  const [isFullscreen, setIsFullscreen] = useState(true);
-  const canvasRef = useRef<HTMLDivElement>(null);
+export default function PixelCanvas({ activeColor, initialGrid }: PixelCanvasProps) {
+  const canvasRef = useRef<HTMLCanvasElement>(null)
+  const containerRef = useRef<HTMLDivElement>(null)
+  const [grid, setGrid] = useState<Map<string, string>>(new Map())
+  const [pendingPixels, setPendingPixels] = useState<Map<string, string>>(new Map())
+  const [hoveredCell, setHoveredCell] = useState<{ x: number; y: number } | null>(null)
+  const [isDragging, setIsDragging] = useState(false)
+  const [lastPosition, setLastPosition] = useState({ x: 0, y: 0 })
+  const [offset, setOffset] = useState({ x: 0, y: 0 })
+  const [zoom, setZoom] = useState(1)
 
-  const handleNewPixel = (newPixel: any) => {
-    const { x, y, color } = newPixel;
-    setGrid((prevGrid) => {
-      // Copia superficial del grid
-      const newGrid = [...prevGrid];
-      // Copia de la fila afectada
-      const newRow = [...newGrid[y]];
-      // Modifica la fila
-      newRow[x] = color;
-      // Asigna la fila modificada al nuevo grid
-      newGrid[y] = newRow;
-      return newGrid;
-    });
-  };
+  // Definir límites del canvas (área donde se pueden colocar píxeles)
+  const canvasLimits = {
+    minX: -128,
+    maxX: 128,
+    minY: -64,
+    maxY: 64,
+  }
 
-  listenToGridChanges((newPixel: any) => handleNewPixel(newPixel));
+  // Tamaño de la celda
+  const cellSize = 10
 
   useEffect(() => {
-    const newGrid = Array(gridSize)
-      .fill(null)
-      .map(() => Array(gridSize).fill("transparent"));
-    if (initialGrid) {
-      initialGrid.forEach(({ x, y, color }) => {
-        newGrid[y][x] = color;
-      });
-    }
-    setGrid(newGrid);
-  }, [gridSize, initialGrid]);
+    const newGrid = new Map<string, string>()
+    initialGrid.forEach(({ x, y, color }) => {
+      newGrid.set(`${x},${y}`, color);
+    });
+    setGrid(newGrid)
+  }, [initialGrid])
+  
 
-  const handlePixelClick = (rowIndex: number, colIndex: number) => {
-    // const newGrid = [...grid];
-    // newGrid[rowIndex][colIndex] = selectedColor;
-    // setGrid(newGrid);
-    if (onPixelClick) {
-      onPixelClick(colIndex, rowIndex, selectedColor);
-    }
+  const handleNewPixel = (newPixel: { x: number; y: number; color: string }) => {
+    const { x, y, color } = newPixel
+    const key = `${x},${y}`
 
-    // Add glitch effect to the canvas
-    if (canvasRef.current) {
-      canvasRef.current.classList.add("glitch-effect");
-      setTimeout(() => {
-        if (canvasRef.current) {
-          canvasRef.current.classList.remove("glitch-effect");
+    setGrid((prevGrid) => {
+      const newGrid = new Map(prevGrid)
+      newGrid.set(key, color)
+      return newGrid
+    })
+
+    setPendingPixels((prev) => {
+      const newPending = new Map(prev)
+      newPending.delete(key)
+      return newPending
+    })
+  }
+
+  useEffect(() => {
+    listenToGridChanges((newPixel: any) => {
+      handleNewPixel(newPixel)
+    })
+  }, [])
+
+  // Función para dibujar el canvas
+  const drawCanvas = () => {
+    const canvas = canvasRef.current
+    if (!canvas) return
+
+    const ctx = canvas.getContext("2d")
+    if (!ctx) return
+
+    const width = canvas.width
+    const height = canvas.height
+
+    // Limpiar canvas
+    ctx.fillStyle = "#1a1a1a"
+    ctx.fillRect(0, 0, width, height)
+
+    // Aplicar transformaciones
+    ctx.save()
+    ctx.translate(width / 2 + offset.x, height / 2 + offset.y)
+    ctx.scale(zoom, zoom)
+
+    // Dibujar el borde del área permitida
+    const borderWidth = (canvasLimits.maxX - canvasLimits.minX + 1) * cellSize
+    const borderHeight = (canvasLimits.maxY - canvasLimits.minY + 1) * cellSize
+    const borderX = canvasLimits.minX * cellSize
+    const borderY = canvasLimits.minY * cellSize
+
+    // Dibujar fondo del área permitida (ligeramente más claro)
+    ctx.fillStyle = "#222222"
+    ctx.fillRect(borderX, borderY, borderWidth, borderHeight)
+
+    // Dibujar borde del área permitida
+    ctx.strokeStyle = "#444444"
+    ctx.lineWidth = 2 / zoom
+    ctx.strokeRect(borderX, borderY, borderWidth, borderHeight)
+
+    // Optimización: Agrupar píxeles por color para reducir cambios de contexto
+    const combinedGrid = new Map(grid)
+    pendingPixels.forEach((color, key) => {
+      combinedGrid.set(key, color)
+    })
+    const pixelsByColor = new Map<string, { x: number; y: number }[]>()
+
+    combinedGrid.forEach((color, key) => {
+      const [x, y] = key.split(",").map(Number)
+
+      if (isWithinLimits(x, y)) {
+        if (!pixelsByColor.has(color)) {
+          pixelsByColor.set(color, [])
         }
-      }, 150);
-    }
-  };
+        pixelsByColor.get(color)?.push({ x, y })
+      }
+    })
 
-  const toggleFullscreen = () => {
-    setIsFullscreen(!isFullscreen);
-  };
+    // Dibujar píxeles agrupados por color
+    pixelsByColor.forEach((pixels, color) => {
+      ctx.fillStyle = color
+
+      // Dibujar cada píxel sin espacios entre ellos
+      pixels.forEach(({ x, y }) => {
+        // Usar un tamaño ligeramente mayor para evitar espacios entre píxeles
+        ctx.fillRect(
+          x * cellSize,
+          y * cellSize,
+          cellSize + 0.5 / zoom, // Añadir una pequeña cantidad para evitar espacios
+          cellSize + 0.5 / zoom,
+        )
+      })
+    })
+
+    // Dibujar retícula alrededor del cursor solo si está dentro de los límites
+    if (hoveredCell && isWithinLimits(hoveredCell.x, hoveredCell.y)) {
+      // Dibujar solo una pequeña área alrededor del cursor (5x5 celdas)
+      const gridRadius = 5
+
+      // Primero dibujar la retícula
+      ctx.strokeStyle = "#333333"
+      ctx.lineWidth = 0.5 / zoom
+
+      for (let i = -gridRadius; i <= gridRadius; i++) {
+        for (let j = -gridRadius; j <= gridRadius; j++) {
+          const x = hoveredCell.x + i
+          const y = hoveredCell.y + j
+
+          // Solo dibujar retícula dentro de los límites
+          if (isWithinLimits(x, y)) {
+            ctx.strokeRect(x * cellSize, y * cellSize, cellSize, cellSize)
+          }
+        }
+      }
+
+      // Luego dibujar el borde de la celda seleccionada
+      ctx.strokeStyle = "#b280ff"
+      ctx.lineWidth = 2 / zoom
+      ctx.strokeRect(hoveredCell.x * cellSize, hoveredCell.y * cellSize, cellSize, cellSize)
+    }
+
+    ctx.restore()
+  }
+
+  // Verificar si una coordenada está dentro de los límites
+  const isWithinLimits = (x: number, y: number): boolean => {
+    return x >= canvasLimits.minX && x <= canvasLimits.maxX && y >= canvasLimits.minY && y <= canvasLimits.maxY
+  }
+
+  // Dibujar el canvas cuando cambian las dependencias
+  useEffect(() => {
+    drawCanvas()
+  }, [grid, pendingPixels, hoveredCell, offset, zoom])
+
+  // Manejar resize del canvas
+  useEffect(() => {
+    const handleResize = () => {
+      const canvas = canvasRef.current
+      const container = containerRef.current
+      if (!canvas || !container) return
+
+      // Establecer el tamaño del canvas al tamaño del contenedor
+      canvas.width = container.clientWidth
+      canvas.height = container.clientHeight
+
+      drawCanvas()
+    }
+
+    window.addEventListener("resize", handleResize)
+    handleResize()
+
+    return () => window.removeEventListener("resize", handleResize)
+  }, [])
+
+  // Convertir coordenadas del mouse a coordenadas del grid
+  const mouseToGrid = (e: React.MouseEvent<HTMLCanvasElement>) => {
+    const canvas = canvasRef.current
+    if (!canvas) return null
+
+    const rect = canvas.getBoundingClientRect()
+
+    // Obtener la posición exacta del mouse relativa al canvas
+    const mouseX = e.clientX - rect.left
+    const mouseY = e.clientY - rect.top
+
+    // Aplicar transformaciones inversas para obtener la posición en el grid
+    const gridX = Math.floor(((mouseX - canvas.width / 2) / zoom - offset.x / zoom) / cellSize)
+    const gridY = Math.floor(((mouseY - canvas.height / 2) / zoom - offset.y / zoom) / cellSize)
+
+    return { x: gridX, y: gridY }
+  }
+
+  const placePixel = async (x: number, y: number) => {
+    if (isWithinLimits(x, y)) {
+      const key = `${x},${y}`
+
+      setPendingPixels((prev) => {
+        const newPending = new Map(prev)
+        newPending.set(key, activeColor)
+        return newPending
+      })
+
+      try {
+        await insertPixel(x, y, activeColor)
+      } catch (error) {
+        console.error("Error al colocar el píxel:", error)
+        setPendingPixels((prev) => {
+          const newPending = new Map(prev)
+          newPending.delete(key)
+          return newPending
+        })
+      }
+    }
+  }
+
+
+  const handleCanvasMouseMove = (e: React.MouseEvent<HTMLCanvasElement>) => {
+    const gridPos = mouseToGrid(e)
+    if (!gridPos) return
+
+    setHoveredCell(gridPos)
+
+    // Manejar arrastre
+    if (isDragging) {
+      const dx = e.clientX - lastPosition.x
+      const dy = e.clientY - lastPosition.y
+
+      setOffset((prev) => ({
+        x: prev.x + dx,
+        y: prev.y + dy,
+      }))
+
+      setLastPosition({
+        x: e.clientX,
+        y: e.clientY,
+      })
+    }
+  }
+
+  const handleCanvasMouseDown = (e: React.MouseEvent<HTMLCanvasElement>) => {
+     // Botón izquierdo: colocar píxel
+     if (e.button === 0) {
+      const gridPos = mouseToGrid(e)
+      if (gridPos) {
+        placePixel(gridPos.x, gridPos.y)
+      }
+    }
+    // Botón derecho o central: iniciar arrastre
+    else if (e.button === 2 || e.button === 1) {
+      e.preventDefault()
+      setIsDragging(true)
+      setLastPosition({
+        x: e.clientX,
+        y: e.clientY,
+      })
+    }
+  }
+
+  const handleCanvasMouseUp = () => {
+    setIsDragging(false)
+  }
+
+  const handleCanvasMouseLeave = () => {
+    setHoveredCell(null)
+    setIsDragging(false)
+  }
+
+  const handleWheel = (e: React.WheelEvent<HTMLCanvasElement>) => {
+    e.preventDefault()
+
+    // Calcular nuevo zoom
+    const delta = -e.deltaY * 0.001
+    const newZoom = Math.max(0.1, Math.min(10, zoom + delta * zoom))
+
+    // Ajustar offset para hacer zoom hacia el cursor
+    const rect = canvasRef.current?.getBoundingClientRect()
+    if (!rect) return
+
+    const mouseX = e.clientX - rect.left
+    const mouseY = e.clientY - rect.top
+
+    const canvasX = mouseX - rect.width / 2
+    const canvasY = mouseY - rect.height / 2
+
+    setOffset((prev) => ({
+      x: prev.x - (canvasX * (newZoom - zoom)) / zoom,
+      y: prev.y - (canvasY * (newZoom - zoom)) / zoom,
+    }))
+
+    setZoom(newZoom)
+  }
+
+  // Prevenir menú contextual
+  const handleContextMenu = (e: React.MouseEvent) => {
+    e.preventDefault()
+    return false
+  }
+
+  // Centrar el canvas en el área permitida
+  const centerCanvas = () => {
+    setOffset({ x: 0, y: 0 })
+    setZoom(1)
+  }
 
   return (
     <div
-      ref={canvasRef}
-      className={`relative flex flex-col w-full h-full ${
-        isFullscreen ? "fixed inset-0 z-50 bg-black p-8" : ""
-      }`}
+      ref={containerRef}
+      className="w-full h-full flex items-center justify-center bg-black relative"
+      style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0 }}
     >
-      <div className="flex justify-between items-center mb-2 text-xs text-gray-500">
-        <div>SOUL Pixel</div>
+      <canvas
+        ref={canvasRef}
+        onMouseMove={handleCanvasMouseMove}
+        onMouseDown={handleCanvasMouseDown}
+        onMouseUp={handleCanvasMouseUp}
+        onMouseLeave={handleCanvasMouseLeave}
+        onWheel={handleWheel}
+        onContextMenu={handleContextMenu}
+        className={`w-full h-full ${isDragging ? "cursor-grabbing" : "cursor-crosshair"}`}
+      />
+
+      {/* Controles de navegación */}
+      <div className="absolute bottom-10 right-4 flex flex-col gap-2 bg-black/70 p-2 rounded-sm border border-purple-900/50 text-xs">
         <button
-          onClick={toggleFullscreen}
-          className="p-1 hover:text-purple-500 transition-colors"
+          className="bg-purple-900/30 hover:bg-purple-900/50 px-2 py-1 rounded-sm"
+          onClick={() => setZoom((prev) => Math.min(10, prev * 1.2))}
         >
-          {isFullscreen ? <Maximize2 size={16} /> : <Minimize2 size={16} />}
+          Zoom +
+        </button>
+        <button
+          className="bg-purple-900/30 hover:bg-purple-900/50 px-2 py-1 rounded-sm"
+          onClick={() => setZoom((prev) => Math.max(0.1, prev / 1.2))}
+        >
+          Zoom -
+        </button>
+        <button className="bg-purple-900/30 hover:bg-purple-900/50 px-2 py-1 rounded-sm" onClick={centerCanvas}>
+          Centrar
         </button>
       </div>
 
-      <div className="relative flex-1 border border-gray-800 rounded-md overflow-hidden bg-black/50">
-        {/* Scanlines effect */}
-        <div className="absolute inset-0 pointer-events-none"></div>
-
-        {/* Pixel grid */}
-        <div
-          className={`absolute inset-0 grid`}
-          style={{
-            display: "grid",
-            gridTemplateColumns: `repeat(${gridSize}, 1fr)`,
-            gridTemplateRows: `repeat(${gridSize}, 1fr)`,
-            padding: "1px",
-            background: "#333333",
-          }}
-        >
-          {grid.map((row, rowIndex) =>
-            row.map((color, colIndex) => (
-              <div
-                key={`${rowIndex}-${colIndex}`}
-                className={`pixel aspect-square transition-colors duration-200 cursor-crosshair border-1`}
-                style={
-                  {
-                    backgroundColor: color,
-                    "--hover-color": selectedColor,
-                  } as React.CSSProperties
-                }
-                onClick={() => handlePixelClick(rowIndex, colIndex)}
-              />
-            ))
-          )}
-        </div>
+      {/* Información de navegación */}
+      <div className="absolute bottom-2 left-2 text-xs text-purple-700 bg-black/70 p-1 rounded-sm">
+        <div>Zoom: {zoom.toFixed(1)}x</div>
+        {hoveredCell && (
+          <div>
+            Pos: ({hoveredCell.x}, {hoveredCell.y})
+            {!isWithinLimits(hoveredCell.x, hoveredCell.y) && (
+              <span className="text-red-500 ml-1">(fuera de límites)</span>
+            )}
+          </div>
+        )}
+        <div className="text-[10px] mt-1">Click: Colocar pixel | Click derecho: Mover | Rueda: Zoom</div>
       </div>
 
-      <div className="mt-2 flex justify-between text-xs text-gray-600">
+      {/* Indicador de límites */}
+      <div className="absolute top-2 left-2 text-xs text-purple-700 bg-black/70 p-1 rounded-sm">
         <div>
-          RESOLUTION: {gridSize}x{gridSize}
+          Límites: {canvasLimits.minX},{canvasLimits.minY} a {canvasLimits.maxX},{canvasLimits.maxY}
         </div>
-        <div className="flex gap-2">
-          <button
-            onClick={() => setGridSize(Math.max(8, gridSize - 4))}
-            className="hover:text-purple-500 transition-colors"
-            disabled={gridSize <= 8}
-          >
-            -
-          </button>
-          <button
-            onClick={() => setGridSize(Math.min(64, gridSize + 4))}
-            className="hover:text-purple-500 transition-colors"
-            disabled={gridSize >= 64}
-          >
-            +
-          </button>
+        <div>
+          Tamaño: {canvasLimits.maxX - canvasLimits.minX + 1}x{canvasLimits.maxY - canvasLimits.minY + 1}
         </div>
       </div>
-
-      <style>{`
-      .pixel:hover {
-        background-color: var(--hover-color) !important;
-        }
-        .scanlines {
-          background: linear-gradient(
-            to bottom,
-            rgba(255, 255, 255, 0.03) 50%,
-            rgba(0, 0, 0, 0.1) 50%
-          );
-          background-size: 100% 4px;
-          z-index: 2;
-        }
-
-        .glitch-effect {
-          animation: glitch 0.15s linear;
-        }
-
-        @keyframes glitch {
-          0% {
-            transform: translate(0);
-          }
-          20% {
-            transform: translate(-3px, 3px);
-          }
-          40% {
-            transform: translate(-3px, -3px);
-          }
-          60% {
-            transform: translate(3px, 3px);
-          }
-          80% {
-            transform: translate(3px, -3px);
-          }
-          100% {
-            transform: translate(0);
-          }
-        }
-
-        @keyframes loading {
-          0% {
-            width: 0;
-          }
-          100% {
-            width: 100%;
-          }
-        }
-      `}</style>
     </div>
-  );
+  )
 }

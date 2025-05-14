@@ -4,6 +4,7 @@ import "../styles/global.css";
 import Layout from "@/layouts/Layout.astro";
 import { getCurrentGrid } from "@/lib/supabase";
 import Panel from "@/components/react/Panel";
+import Header from "@/components/Header.astro";
 
 const { userId } = Astro.locals.auth()
 
@@ -16,8 +17,10 @@ const { data, error } = await getCurrentGrid();
 
 <Layout>
   <div
-    class="relative flex min-h-screen flex-col items-center justify-between bg-black text-gray-300 font-mono overflow-hidden"
+    class="min-h-screen bg-black text-purple-500 font-mono flex flex-col"
   >
+    <Header />
+
     <Panel initialGrid={data} client:load />
   </div>
 </Layout>
