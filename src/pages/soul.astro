@@ -3,8 +3,13 @@ import "../styles/global.css";
 // Component Imports
 import Layout from "@/layouts/Layout.astro";
 import { getCurrentGrid } from "@/lib/supabase";
-import Header from "@/components/Header";
 import Panel from "@/components/react/Panel";
+
+const { userId } = Astro.locals.auth()
+
+if (!userId) {
+  return Astro.redirect("/");
+}
 
 const { data, error } = await getCurrentGrid();
 ---
