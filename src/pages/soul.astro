@@ -2,7 +2,7 @@
 import "../styles/global.css";
 // Component Imports
 import Layout from "@/layouts/Layout.astro";
-import { getCurrentGrid } from "@/lib/supabase";
+import { getCurrentGrid, getLeaderboard } from "@/lib/supabase";
 import Panel from "@/components/react/Panel";
 import Header from "@/components/Header.astro";
 
@@ -13,6 +13,8 @@ if (!userId) {
 }
 
 const { data, error } = await getCurrentGrid();
+
+const { data: initialLeaderboard } = await getLeaderboard();
 ---
 
 <Layout>
@@ -21,6 +23,10 @@ const { data, error } = await getCurrentGrid();
   >
     <Header />
 
-    <Panel initialGrid={data} client:load />
+    <Panel 
+      initialLeaderboard={initialLeaderboard}
+      initialGrid={data}
+      client:load 
+    />
   </div>
 </Layout>

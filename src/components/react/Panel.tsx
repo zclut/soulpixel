@@ -3,9 +3,11 @@ import Footer from "@/components/Footer";
 import { TerminalIcon } from "lucide-react";
 import PixelCanvas from "@/components/react/PixelCanvas";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import Leaderboard from "@/components/react/Leaderboard";
 
 interface Props {
   initialGrid: any[];
+  initialLeaderboard: any[];
 }
 
 export default function Panel({ initialGrid }: Props) {
@@ -56,8 +58,7 @@ export default function Panel({ initialGrid }: Props) {
                 Terminal
               </TabsContent>
               <TabsContent value="leaderboard" className="flex-1 p-0 m-0">
-                {/* <Leaderboard /> */}
-                Leaderboard
+                <Leaderboard/>
               </TabsContent>
               <TabsContent value="achievements" className="flex-1 p-0 m-0">
                 {/* <Achievements /> */}
