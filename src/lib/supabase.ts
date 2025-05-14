@@ -14,6 +14,11 @@ export const getCurrentGrid = async () => {
     return { data, error }
 }
 
+export const getLeaderboard = async () => {
+    const { data, error } = await supabase.rpc('leaderboard')
+    return { data, error }
+}
+
 export const getHistoricalGrid = async () => {
     const { data, error } = await supabase.from('grid').select('*')
     return { data, error }

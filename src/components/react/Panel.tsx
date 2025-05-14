@@ -17,10 +17,7 @@ export default function Panel({ initialGrid }: Props) {
       <div className="flex-1 flex flex-col md:flex-row gap-2 p-2">
         {/*  Left Panel - Canvas */}
         <div className="flex-1 relative">
-          <PixelCanvas 
-            activeColor={selectedColor}
-            initialGrid={initialGrid}
-          />
+          <PixelCanvas activeColor={selectedColor} initialGrid={initialGrid} />
         </div>
 
         {/* Right Panel - Chat */}
@@ -35,13 +32,22 @@ export default function Panel({ initialGrid }: Props) {
             </div>
             <Tabs defaultValue="feed" className="flex-1 flex flex-col">
               <TabsList className="bg-black border-b border-purple-900/50 rounded-none h-8 w-full">
-                <TabsTrigger value="feed" className="text-xs h-6 data-[state=active]:bg-purple-900/20">
+                <TabsTrigger
+                  value="feed"
+                  className="text-xs h-6 data-[state=active]:bg-purple-900/20"
+                >
                   FEED
                 </TabsTrigger>
-                <TabsTrigger value="leaderboard" className="text-xs h-6 data-[state=active]:bg-purple-900/20">
+                <TabsTrigger
+                  value="leaderboard"
+                  className="text-xs h-6 data-[state=active]:bg-purple-900/20"
+                >
                   LEADERBOARD
                 </TabsTrigger>
-                <TabsTrigger value="achievements" className="text-xs h-6 data-[state=active]:bg-purple-900/20">
+                <TabsTrigger
+                  value="achievements"
+                  className="text-xs h-6 data-[state=active]:bg-purple-900/20"
+                >
                   ACHIEVEMENTS
                 </TabsTrigger>
               </TabsList>
