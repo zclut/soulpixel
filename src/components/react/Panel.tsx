@@ -10,7 +10,7 @@ interface Props {
   initialLeaderboard: any[];
 }
 
-export default function Panel({ initialGrid }: Props) {
+export default function Panel({ initialGrid, initialLeaderboard }: Props) {
   const [selectedColor, setSelectedColor] = useState("#FFFFFF");
 
   return (
@@ -58,7 +58,7 @@ export default function Panel({ initialGrid }: Props) {
                 Terminal
               </TabsContent>
               <TabsContent value="leaderboard" className="flex-1 p-0 m-0">
-                <Leaderboard/>
+                <Leaderboard initialLeaderboard={initialLeaderboard}/>
               </TabsContent>
               <TabsContent value="achievements" className="flex-1 p-0 m-0">
                 {/* <Achievements /> */}

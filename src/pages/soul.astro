@@ -22,7 +22,7 @@ const { data: initialLeaderboard } = await getLeaderboard();
     <Header />
 
     <Panel 
-      initialLeaderboard={initialLeaderboard}
+      initialLeaderboard={initialLeaderboard ?? []}
       initialGrid={data}
       client:load 
     />
