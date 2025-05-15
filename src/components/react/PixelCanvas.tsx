@@ -149,7 +149,11 @@ export default function PixelCanvas({
     });
 
     // Dibujar retícula alrededor del cursor solo si está dentro de los límites
-    if (hoveredCell && isWithinLimits(hoveredCell.x, hoveredCell.y)) {
+    if (
+      hoveredCell &&
+      isWithinLimits(hoveredCell.x, hoveredCell.y) &&
+      cooldown <= 0
+    ) {
       // Dibujar solo una pequeña área alrededor del cursor (5x5 celdas)
       const gridRadius = 5;
 
@@ -541,7 +545,11 @@ export default function PixelCanvas({
         onTouchEnd={handleCanvasPointerUp}
         onTouchCancel={handleCanvasPointerCancel}
         className={`w-full h-full ${
-          isDragging ? "cursor-grabbing" : "cursor-crosshair"
+          isDragging
+            ? "cursor-grabbing"
+            : cooldown > 0
+            ? "cursor-not-allowed"
+            : "cursor-crosshair"
         }`}
       />
 
