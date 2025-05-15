@@ -20,19 +20,6 @@ interface Props {
 export default function Leaderboard({ initialLeaderboard, username }: Props) {
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
 
-  //   const handleLeaderBoardChanges = (newPixel: any) => {
-  //     setLeaderboard((prev) => {
-  //       const newLeaderboard = [...prev];
-  //       const user = newLeaderboard.find((user) => user.user_id === u?.username);
-  //       if (user) {
-  //         user.total += 1;
-  //       }
-  //       return newLeaderboard;
-  //     });
-  //   };
-
-  //   listenToGridChanges(handleLeaderBoardChanges)
-
   useEffect(() => {
     const rankedUsers = initialLeaderboard.map((user, index) => ({
       ...user,

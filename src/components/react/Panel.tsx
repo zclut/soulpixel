@@ -32,7 +32,7 @@ export default function Panel({
       {/* Main Content */}
       {isMobile && (
         <div className="flex flex-col md:h-[calc(100vh-49px)] h-[60vh] p-2">
-          <RightPanel initialLeaderboard={initialLeaderboard} user={null} />
+          <RightPanel initialLeaderboard={initialLeaderboard} user={you} />
         </div>
       )}
 
@@ -49,7 +49,7 @@ export default function Panel({
 
         {/* Right Panel  */}
         {!isMobile && (
-          <RightPanel initialLeaderboard={initialLeaderboard} user={null} />
+          <RightPanel initialLeaderboard={initialLeaderboard} user={you} />
         )}
       </div>
 

@@ -1,18 +1,18 @@
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import Leaderboard from "@/components/react/Leaderboard"
-import Feed from "@/components/react/Feed"
-import Profile from "@/components/react/Profile"
-import { TerminalIcon } from "lucide-react"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import Leaderboard from "@/components/react/Leaderboard";
+import Feed from "@/components/react/Feed";
+import Profile from "@/components/react/Profile";
+import { TerminalIcon } from "lucide-react";
 
 interface Props {
-  initialLeaderboard: any[]
-  user: any
+  initialLeaderboard: any[];
+  user: any;
 }
 
 const RightPanel = ({ initialLeaderboard, user }: Props) => {
   return (
     <div className="w-full md:w-96 h-full flex flex-col gap-2">
-      <Profile user={user || { username: "zclut" }} />
+      <Profile user={user} />
 
       <div className="border border-purple-900/50 bg-black/80 rounded-sm flex flex-col flex-1 overflow-hidden">
         <div className="p-2 border-b border-purple-900/50 flex justify-between items-center">
@@ -24,13 +24,22 @@ const RightPanel = ({ initialLeaderboard, user }: Props) => {
 
         <Tabs defaultValue="feed" className="flex flex-col h-full">
           <TabsList className="bg-black border-b border-purple-900/50 rounded-none h-8 w-full shrink-0">
-            <TabsTrigger value="feed" className="text-xs h-6 data-[state=active]:bg-purple-900/20">
+            <TabsTrigger
+              value="feed"
+              className="text-xs h-6 data-[state=active]:bg-purple-900/20"
+            >
               FEED
             </TabsTrigger>
-            <TabsTrigger value="leaderboard" className="text-xs h-6 data-[state=active]:bg-purple-900/20">
+            <TabsTrigger
+              value="leaderboard"
+              className="text-xs h-6 data-[state=active]:bg-purple-900/20"
+            >
               LEADERBOARD
             </TabsTrigger>
-            <TabsTrigger value="achievements" className="text-xs h-6 data-[state=active]:bg-purple-900/20">
+            <TabsTrigger
+              value="achievements"
+              className="text-xs h-6 data-[state=active]:bg-purple-900/20"
+            >
               ACHIEVEMENTS
             </TabsTrigger>
           </TabsList>
@@ -40,7 +49,10 @@ const RightPanel = ({ initialLeaderboard, user }: Props) => {
               <Feed />
             </TabsContent>
             <TabsContent value="leaderboard" className="h-full">
-              <Leaderboard initialLeaderboard={initialLeaderboard} />
+              <Leaderboard
+                username={user}
+                initialLeaderboard={initialLeaderboard}
+              />
             </TabsContent>
             <TabsContent value="achievements" className="h-full">
               <div className="p-2 font-mono text-xs">Achievements content</div>
@@ -49,7 +61,7 @@ const RightPanel = ({ initialLeaderboard, user }: Props) => {
         </Tabs>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default RightPanel
+export default RightPanel;

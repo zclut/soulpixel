@@ -9,7 +9,7 @@ interface Props {
 const Profile = ({ user }: Props) => {
   const profile = [
     { id: 1, name: "SOUL", value: user.username },
-    { id: 2, name: "RANK", value: "INITIATE" },
+    { id: 2, name: "LEVEL", value: "INITIATE" },
     { id: 3, name: "PIXELS", value: "12,458" },
   ];
 
