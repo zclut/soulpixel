@@ -7,6 +7,7 @@ export type Pixel = {
     user: string;
     created_at: string;
     message?: string;
+    uuid?: string;
   };
 
 export const feedList = atom<Pixel[]>([]);

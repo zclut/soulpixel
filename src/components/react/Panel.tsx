@@ -22,8 +22,11 @@ export default function Panel({
     $userStore.get,
     $userStore.get
   );
-  const isMobile = useIsMobile();
 
+  const isMobile = useIsMobile();
+  if (!you || !you.username) {
+    return;
+  }
   return (
     <>
       {/* Main Content */}
@@ -40,7 +43,7 @@ export default function Panel({
             activeColor={selectedColor}
             initialGrid={initialGrid}
             lastPixelPlaced={lastPixelPlaced}
-            username={you?.username ?? ""}
+            username={you?.username!}
           />
         </div>
 

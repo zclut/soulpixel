@@ -59,8 +59,6 @@ export default function PixelCanvas({
 
     setGrid((prevGrid) => {
       const newGrid = new Map(prevGrid);
-      let oldPixel = newGrid;
-      addFeedStore(newPixel as any, username);
 
       newGrid.set(key, color);
       return newGrid;
