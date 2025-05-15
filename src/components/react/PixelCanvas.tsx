@@ -187,6 +187,27 @@ export default function PixelCanvas({ activeColor, initialGrid, lastPixelPlaced 
     return () => window.removeEventListener("resize", handleResize)
   }, [])
 
+  // Manejar zoom de afuera
+  useEffect(() => {
+    const preventScroll = (e: Event) => {
+      e.preventDefault();
+    };
+
+    const container = containerRef.current;
+
+    if (container) {
+      container.addEventListener("wheel", preventScroll, { passive: false });
+      container.addEventListener("touchmove", preventScroll, { passive: false });
+    }
+
+    return () => {
+      if (container) {
+        container.removeEventListener("wheel", preventScroll);
+        container.removeEventListener("touchmove", preventScroll);
+      }
+    };
+  }, []);
+
   // Convertir coordenadas del mouse a coordenadas del grid
   const mouseToGrid = (e: React.MouseEvent<HTMLCanvasElement>) => {
     const canvas = canvasRef.current
@@ -376,6 +397,79 @@ export default function PixelCanvas({ activeColor, initialGrid, lastPixelPlaced 
   };
   
 
+  // Mobile
+  const getEventPos = (e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>) => {
+    if ("touches" in e && e.touches.length > 0) {
+      return {
+        clientX: e.touches[0].clientX,
+        clientY: e.touches[0].clientY,
+      };
+    } else if ("clientX" in e) {
+      return {
+        clientX: e.clientX,
+        clientY: e.clientY,
+      };
+    }
+    return null;
+  };
+  
+  const handleCanvasPointerMove = (e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>) => {
+    e.preventDefault();
+    const pos = getEventPos(e);
+    if (!pos) return;
+  
+    const gridPos = mouseToGrid({ clientX: pos.clientX, clientY: pos.clientY } as React.MouseEvent<HTMLCanvasElement>);
+    if (!gridPos) return;
+  
+    setHoveredCell(gridPos);
+  
+    if (isDragging) {
+      const dx = pos.clientX - lastPosition.x;
+      const dy = pos.clientY - lastPosition.y;
+  
+      setOffset((prev) => ({
+        x: prev.x + dx,
+        y: prev.y + dy,
+      }));
+  
+      setLastPosition({
+        x: pos.clientX,
+        y: pos.clientY,
+      });
+    }
+  };
+  
+  const handleCanvasPointerDown = (e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>) => {
+    e.preventDefault();
+    const pos = getEventPos(e);
+    if (!pos) return;
+  
+    const gridPos = mouseToGrid({ clientX: pos.clientX, clientY: pos.clientY } as React.MouseEvent<HTMLCanvasElement>);
+    if (!gridPos) return;
+  
+    // Para touch solo colocamos pixel (sin botones secundarios)
+    if ("touches" in e) {
+      placePixel(gridPos.x, gridPos.y);
+    } else if ("button" in e) {
+      if (e.button === 0) {
+        placePixel(gridPos.x, gridPos.y);
+      } else if (e.button === 2 || e.button === 1) {
+        setIsDragging(true);
+        setLastPosition({ x: pos.clientX, y: pos.clientY });
+      }
+    }
+  };
+  
+  const handleCanvasPointerUp = (e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>) => {
+    e.preventDefault();
+    setIsDragging(false);
+  };
+  
+  const handleCanvasPointerCancel = (e: React.TouchEvent<HTMLCanvasElement>) => {
+    e.preventDefault();
+    setIsDragging(false);
+  };
+
   return (
     <div
       ref={containerRef}
@@ -390,6 +484,10 @@ export default function PixelCanvas({ activeColor, initialGrid, lastPixelPlaced 
         onMouseLeave={handleCanvasMouseLeave}
         onWheel={handleWheel}
         onContextMenu={handleContextMenu}
+        onTouchStart={handleCanvasPointerDown}
+        onTouchMove={handleCanvasPointerMove}
+        onTouchEnd={handleCanvasPointerUp}
+        onTouchCancel={handleCanvasPointerCancel}
         className={`w-full h-full ${isDragging ? "cursor-grabbing" : "cursor-crosshair"}`}
       />
 

@@ -20,9 +20,7 @@ const { data: lastPixelPlaced } = await getLastPixelPlaced(username)
 ---
 
 <Layout>
-  <div class="min-h-screen bg-black text-purple-500 font-mono flex flex-col">
-    <Header />
-
+  <div class="bg-black text-purple-500 font-mono">
     <Panel 
       initialLeaderboard={initialLeaderboard ?? []}
       initialGrid={data}
