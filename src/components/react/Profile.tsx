@@ -43,9 +43,9 @@ const Profile = ({ user }: Props) => {
           </div>
           <div className="flex flex-wrap justify-between text-sm w-full">
             {profile.map(({ id, name, value }) => (
-              <div key={id} className="flex w-1/2 items-center gap-1">
+              <div key={id} className={`flex w-1/2 items-center gap-1`}>
                 <span className="text-purple-500">{name}:</span>
-                <span className="text-fuchsia-500">{value}</span>
+                <span className="text-fuchsia-500 truncate">{value}</span>
               </div>
             ))}
           </div>
