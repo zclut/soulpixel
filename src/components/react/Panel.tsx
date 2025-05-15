@@ -9,9 +9,10 @@ import PixelCanvas from "@/components/react/PixelCanvas";
 interface Props {
   initialGrid: any[];
   initialLeaderboard: any[];
+  lastPixelPlaced: any;
 }
 
-export default function Panel({ initialGrid, initialLeaderboard }: Props) {
+export default function Panel({ initialGrid, initialLeaderboard, lastPixelPlaced }: Props) {
   const [selectedColor, setSelectedColor] = useState("#FFFFFF");
 
   return (
@@ -20,7 +21,11 @@ export default function Panel({ initialGrid, initialLeaderboard }: Props) {
       <div className="flex-1 flex flex-col md:flex-row gap-2 p-2">
         {/*  Left Panel - Canvas */}
         <div className="flex-1 relative">
-          <PixelCanvas activeColor={selectedColor} initialGrid={initialGrid} />
+          <PixelCanvas 
+            activeColor={selectedColor} 
+            initialGrid={initialGrid}
+            lastPixelPlaced={lastPixelPlaced}
+          />
         </div>
 
         {/* Right Panel - Chat */}

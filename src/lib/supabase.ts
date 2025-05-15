@@ -52,6 +52,14 @@ export const getHistoricalGrid = async () => {
     return { data, error };
 };
 
+export const getLastPixelPlaced = async (user_id: string) => {
+    const { data, error } = await supabase
+        .rpc("get_last_pixel_by_user", { 
+            user_id,
+        }).limit(1);
+    return { data, error };
+};
+
 // INSERTS
 
 export const insertPixel = async (
