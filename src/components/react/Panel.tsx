@@ -1,9 +1,10 @@
-import { useState } from "react";
-import Footer from "@/components/Footer";
-import { TerminalIcon } from "lucide-react";
-import PixelCanvas from "@/components/react/PixelCanvas";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { TerminalIcon } from "lucide-react";
+import { useState } from "react";
+import Feed from "@/components/react/Feed";
+import Footer from "@/components/Footer";
 import Leaderboard from "@/components/react/Leaderboard";
+import PixelCanvas from "@/components/react/PixelCanvas";
 
 interface Props {
   initialGrid: any[];
@@ -54,8 +55,7 @@ export default function Panel({ initialGrid, initialLeaderboard }: Props) {
                 </TabsTrigger>
               </TabsList>
               <TabsContent value="feed" className="flex-1 p-0 m-0">
-                {/* <Terminal /> */}
-                Terminal
+                <Feed />
               </TabsContent>
               <TabsContent value="leaderboard" className="flex-1 p-0 m-0">
                 <Leaderboard initialLeaderboard={initialLeaderboard}/>
