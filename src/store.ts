@@ -1,11 +1,12 @@
-import { atom } from 'nanostores';
+import { atom } from "nanostores";
 
-type Feed = {
+export type Pixel = {
     x: number;
     y: number;
     color: string;
     user: string;
     created_at: string;
-}
+    message?: string;
+  };
 
-export const feed = atom<Feed | null>(null);
+export const feedList = atom<Pixel[]>([]);

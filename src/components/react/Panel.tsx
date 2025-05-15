@@ -1,10 +1,11 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { TerminalIcon } from "lucide-react";
-import { useState } from "react";
+import { useState, useSyncExternalStore } from "react";
 import Feed from "@/components/react/Feed";
 import Footer from "@/components/Footer";
 import Leaderboard from "@/components/react/Leaderboard";
 import PixelCanvas from "@/components/react/PixelCanvas";
+import { $userStore } from "@clerk/astro/client";
 
 interface Props {
   initialGrid: any[];
@@ -13,6 +14,11 @@ interface Props {
 
 export default function Panel({ initialGrid, initialLeaderboard }: Props) {
   const [selectedColor, setSelectedColor] = useState("#FFFFFF");
+  const you = useSyncExternalStore(
+    $userStore.listen,
+    $userStore.get,
+    $userStore.get
+  );
 
   return (
     <>
@@ -20,7 +26,11 @@ export default function Panel({ initialGrid, initialLeaderboard }: Props) {
       <div className="flex-1 flex flex-col md:flex-row gap-2 p-2">
         {/*  Left Panel - Canvas */}
         <div className="flex-1 relative">
-          <PixelCanvas activeColor={selectedColor} initialGrid={initialGrid} />
+          <PixelCanvas
+            activeColor={selectedColor}
+            initialGrid={initialGrid}
+            username={you?.username ?? ""}
+          />
         </div>
 
         {/* Right Panel - Chat */}
@@ -58,7 +68,10 @@ export default function Panel({ initialGrid, initialLeaderboard }: Props) {
                 <Feed />
               </TabsContent>
               <TabsContent value="leaderboard" className="flex-1 p-0 m-0">
-                <Leaderboard initialLeaderboard={initialLeaderboard}/>
+                <Leaderboard
+                  initialLeaderboard={initialLeaderboard}
+                  username={you?.username ?? ""}
+                />
               </TabsContent>
               <TabsContent value="achievements" className="flex-1 p-0 m-0">
                 {/* <Achievements /> */}

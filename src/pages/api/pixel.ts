@@ -26,10 +26,21 @@ export const POST: APIRoute = async ({ request, locals }) => {
       statusText: "Bad request",
     });
   }
-
+  const created_at = new Date();
+  const hora = new Intl.DateTimeFormat('en-GB', {
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: false,
+  }).format(created_at);
+    
   return new Response(
     JSON.stringify({
-      message: `${username} add pixel in ${x}, ${y} with color ${color}`,
+      "user": username,
+      "x": x,
+      "y": y,
+      "color": color,
+      "created_at": hora,
     })
   );
 };

@@ -1,8 +1,7 @@
-import { useState, useEffect, useSyncExternalStore } from "react";
+import { useState, useEffect } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Trophy } from "lucide-react";
 import { getLevelFromPixels } from "@/lib/utils";
-import { $userStore } from "@clerk/astro/client";
 
 type LeaderboardEntry = {
   id: number;
@@ -15,35 +14,31 @@ type LeaderboardEntry = {
 
 interface Props {
   initialLeaderboard: any[];
+  username: string;
 }
 
-export default function Leaderboard({ initialLeaderboard }: Props) {
+export default function Leaderboard({ initialLeaderboard, username }: Props) {
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
-  const u = useSyncExternalStore(
-    $userStore.listen,
-    $userStore.get,
-    $userStore.get
-  );
 
-//   const handleLeaderBoardChanges = (newPixel: any) => {
-//     setLeaderboard((prev) => {
-//       const newLeaderboard = [...prev];
-//       const user = newLeaderboard.find((user) => user.user_id === u?.username);
-//       if (user) {
-//         user.total += 1;
-//       }
-//       return newLeaderboard;
-//     });
-//   };
+  //   const handleLeaderBoardChanges = (newPixel: any) => {
+  //     setLeaderboard((prev) => {
+  //       const newLeaderboard = [...prev];
+  //       const user = newLeaderboard.find((user) => user.user_id === u?.username);
+  //       if (user) {
+  //         user.total += 1;
+  //       }
+  //       return newLeaderboard;
+  //     });
+  //   };
 
-//   listenToGridChanges(handleLeaderBoardChanges)
+  //   listenToGridChanges(handleLeaderBoardChanges)
 
   useEffect(() => {
     const rankedUsers = initialLeaderboard.map((user, index) => ({
       ...user,
       level: getLevelFromPixels(user.total),
       rank: index + 1,
-      isYou: user.user_id === u?.username,
+      isYou: user.user_id === username,
     }));
 
     setLeaderboard(rankedUsers);

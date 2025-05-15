@@ -1,3 +1,4 @@
+import { addFeedStore } from "@/utils/feed.store";
 import { createClient } from "@supabase/supabase-js";
 
 export const supabase = createClient(

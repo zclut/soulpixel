@@ -4,7 +4,7 @@ const HEADERS = {
 
 
 export const insertPixel = async (x: number, y: number, color: string) => {
-    await fetch("/api/pixel", {
+    const response = await fetch("/api/pixel", {
         method: "POST",
         headers: HEADERS,
         body: JSON.stringify({
@@ -13,4 +13,10 @@ export const insertPixel = async (x: number, y: number, color: string) => {
             color,
         }),
     });
+
+    if (!response.ok) {
+        throw new Error("Failed to insert pixel");
+    }
+    const data = await response.json();
+    return data;
 };
