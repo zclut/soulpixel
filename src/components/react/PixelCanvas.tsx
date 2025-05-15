@@ -1,5 +1,6 @@
 import { listenToGridChanges } from "@/lib/supabase";
 import { insertPixel } from "@/services/api";
+import { Download, Shrink, ZoomIn, ZoomOut } from "lucide-react";
 import type React from "react"
 
 import { useState, useEffect, useRef } from "react"
@@ -322,6 +323,58 @@ export default function PixelCanvas({ activeColor, initialGrid }: PixelCanvasPro
     setZoom(1)
   }
 
+  const downloadCanvas = () => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+  
+    const tempCanvas = document.createElement("canvas");
+    const tempCtx = tempCanvas.getContext("2d");
+    if (!tempCtx) return;
+  
+    const { minX, maxX, minY, maxY } = canvasLimits;
+    const width = (maxX - minX + 1) * cellSize;
+    const height = (maxY - minY + 1) * cellSize;
+  
+    tempCanvas.width = width;
+    tempCanvas.height = height;
+  
+    // Dibujar fondo
+    tempCtx.fillStyle = "#1a1a1a";
+    tempCtx.fillRect(0, 0, width, height);
+  
+    // Dibujar píxeles
+    const combinedGrid = new Map(grid);
+    pendingPixels.forEach((color, key) => {
+      combinedGrid.set(key, color);
+    });
+  
+    combinedGrid.forEach((color, key) => {
+      const [x, y] = key.split(",").map(Number);
+      if (x >= minX && x <= maxX && y >= minY && y <= maxY) {
+        const drawX = (x - minX) * cellSize;
+        const drawY = (y - minY) * cellSize;
+  
+        tempCtx.fillStyle = color;
+        tempCtx.fillRect(drawX, drawY, cellSize, cellSize);
+      }
+    });
+
+    const padding = 8;
+    const fontSize = 26;
+    tempCtx.font = `${fontSize}px sans-serif`;
+    tempCtx.fillStyle = "rgba(255, 255, 255, 0.5)";
+    tempCtx.textAlign = "right";
+    tempCtx.textBaseline = "bottom";
+    tempCtx.fillText("SOUL PIXEL", width - padding, height - padding);
+  
+    // Descargar imagen
+    const link = document.createElement("a");
+    link.download = "pixel_canvas_area.png";
+    link.href = tempCanvas.toDataURL("image/png");
+    link.click();
+  };
+  
+
   return (
     <div
       ref={containerRef}
@@ -340,46 +393,56 @@ export default function PixelCanvas({ activeColor, initialGrid }: PixelCanvasPro
       />
 
       {/* Controles de navegación */}
-      <div className="absolute bottom-10 right-4 flex flex-col gap-2 bg-black/70 p-2 rounded-sm border border-purple-900/50 text-xs">
+      <div className="absolute bottom-2 left-2 flex flex-col gap-2 bg-black/70 p-2 rounded-sm border border-purple-900/50 text-xs"> 
+        <div className="flex gap-2">
+          <button
+            className="bg-purple-900/30 hover:bg-purple-900/50 px-2 py-1 rounded-sm"
+            onClick={() => setZoom((prev) => Math.min(10, prev * 1.2))}
+            title="Zoom In"
+          >
+            <ZoomIn size={16} />
+          </button>
+          <button
+            className="bg-purple-900/30 hover:bg-purple-900/50 px-2 py-1 rounded-sm"
+            onClick={() => setZoom((prev) => Math.max(0.1, prev / 1.2))}
+            title="Zoom Out"
+          >
+            <ZoomOut size={16} />
+          </button>
+          <button 
+            className="bg-purple-900/30 hover:bg-purple-900/50 px-2 py-1 rounded-sm"
+            onClick={centerCanvas}
+            title="Center"
+          >
+            <Shrink size={16} />
+          </button>
+        </div>
+      </div>
+
+      {/* Download actual canvas button */}
+      <div className="absolute bottom-2 right-2 flex gap-2 bg-black/70 p-2 rounded-sm border border-purple-900/50 text-xs">
         <button
           className="bg-purple-900/30 hover:bg-purple-900/50 px-2 py-1 rounded-sm"
-          onClick={() => setZoom((prev) => Math.min(10, prev * 1.2))}
+          onClick={downloadCanvas}
+          title="Download"
         >
-          Zoom +
-        </button>
-        <button
-          className="bg-purple-900/30 hover:bg-purple-900/50 px-2 py-1 rounded-sm"
-          onClick={() => setZoom((prev) => Math.max(0.1, prev / 1.2))}
-        >
-          Zoom -
-        </button>
-        <button className="bg-purple-900/30 hover:bg-purple-900/50 px-2 py-1 rounded-sm" onClick={centerCanvas}>
-          Centrar
+          <Download size={16} />
         </button>
       </div>
 
       {/* Información de navegación */}
-      <div className="absolute bottom-2 left-2 text-xs text-purple-700 bg-black/70 p-1 rounded-sm">
-        <div>Zoom: {zoom.toFixed(1)}x</div>
-        {hoveredCell && (
-          <div>
-            Pos: ({hoveredCell.x}, {hoveredCell.y})
-            {!isWithinLimits(hoveredCell.x, hoveredCell.y) && (
-              <span className="text-red-500 ml-1">(fuera de límites)</span>
+      <div className="absolute top-2 left-2 text-xs bg-black/70 rounded-sm border border-purple-900/50 p-1 ">
+          <div className="mt-1">Left: Draw | Right: Move | Scroll: Zoom</div>
+          <div className="flex justify-between">
+            <div>Zoom: {zoom.toFixed(1)}x</div>
+            {hoveredCell && (
+              <div
+                className={`${!isWithinLimits(hoveredCell.x, hoveredCell.y) ? "hidden" : "block"}`}
+              >
+                X,Y: ({hoveredCell.x}, {hoveredCell.y})
+              </div>
             )}
           </div>
-        )}
-        <div className="text-[10px] mt-1">Click: Colocar pixel | Click derecho: Mover | Rueda: Zoom</div>
-      </div>
-
-      {/* Indicador de límites */}
-      <div className="absolute top-2 left-2 text-xs text-purple-700 bg-black/70 p-1 rounded-sm">
-        <div>
-          Límites: {canvasLimits.minX},{canvasLimits.minY} a {canvasLimits.maxX},{canvasLimits.maxY}
-        </div>
-        <div>
-          Tamaño: {canvasLimits.maxX - canvasLimits.minX + 1}x{canvasLimits.maxY - canvasLimits.minY + 1}
-        </div>
       </div>
     </div>
   )
