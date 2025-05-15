@@ -35,7 +35,7 @@ export default function OnlineUsers() {
 
   return (
     <div className="flex items-center gap-1">
-      <Activity className="h-5 w-5"/> 
+      <Activity className="h-3 w-3"/> 
       <span>CONNECTED SOULS: {onlineCount}</span>
     </div>
   );

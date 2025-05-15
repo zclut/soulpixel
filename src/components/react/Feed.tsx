@@ -25,7 +25,7 @@ export default function Feed() {
   }, [logs]);
 
   return (
-    <ScrollArea className="h-[300px] w-full" ref={scrollRef}>
+    <ScrollArea className="h-full w-full" ref={scrollRef}>
       <div className="p-2 space-y-1 font-mono text-xs">
         {$feedList.map((feed) => (
           <div
