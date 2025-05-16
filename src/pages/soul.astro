@@ -2,7 +2,6 @@
 import "../styles/global.css";
 // Component Imports
 import Layout from "@/layouts/Layout.astro";
-import { getCurrentGrid, getLastPixelPlaced } from "@/lib/supabase";
 import Panel from "@/components/react/Panel";
 
 const user = await Astro.locals.currentUser();
@@ -11,17 +10,11 @@ const user = await Astro.locals.currentUser();
 if (!user || !user?.username) {
   return Astro.redirect("/");
 }
-
-const username = user?.username;
-const { data } = await getCurrentGrid();
-const { data: lastPixelPlaced } = await getLastPixelPlaced(username)
 ---
 
 <Layout>
   <div class="bg-black text-purple-500 font-mono">
     <Panel 
-      initialGrid={data}
-      lastPixelPlaced={lastPixelPlaced[0] ?? null}
       client:load 
     />
   </div>
