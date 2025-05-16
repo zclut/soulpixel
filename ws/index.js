@@ -4,7 +4,7 @@ const io = require("socket.io")(3000, {
     },
 });
 
-const MAX_USERS = 1;
+const MAX_USERS = 150;
 const connectedUsers = new Map();
 const waitingQueue = [];
 
