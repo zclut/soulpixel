@@ -18,7 +18,9 @@ export const useQueue = (user_id: string | null) => {
         if (!user_id) return;
 
         if (!socket) {
-            socket = io(PUBLIC_WS_QUEUE_URL);
+            socket = io(PUBLIC_WS_QUEUE_URL, {
+                path: "/socket.io"
+            });
         }
 
         socket.emit("join", user_id);
