@@ -46,7 +46,7 @@ const RightPanel = ({ user }: Props) => {
 
           <div className="flex-1 overflow-hidden">
             <TabsContent value="feed" className="h-full">
-              <Feed />
+              <Feed username={user.username} />
             </TabsContent>
             <TabsContent value="leaderboard" className="h-full">
               <Leaderboard username={user.username} />
