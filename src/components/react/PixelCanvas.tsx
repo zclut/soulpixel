@@ -14,14 +14,12 @@ import { useStore } from "@nanostores/react";
 
 interface PixelCanvasProps {
   activeColor: string;
-  initialGrid: any[];
   username: string;
   lastPixelPlaced: any;
 }
 
 export default function PixelCanvas({
   activeColor,
-  initialGrid,
   lastPixelPlaced,
   username,
 }: PixelCanvasProps) {
@@ -40,14 +38,6 @@ export default function PixelCanvas({
   const [cooldown, setCooldown] = useState(
     getCooldownRemaining(lastPixelPlaced.created_at ?? null)
   );
-
-  // useEffect(() => {
-  //   const newGrid = new Map<string, string>();
-  //   initialGrid.forEach(({ x, y, color }) => {
-  //     newGrid.set(`${x},${y}`, color);
-  //   });
-  //   setGrid(newGrid);
-  // }, [initialGrid]);
 
   const handleNewPixel = (newPixel: any) => {
     const { x, y } = newPixel;

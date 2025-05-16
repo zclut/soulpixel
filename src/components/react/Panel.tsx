@@ -45,7 +45,6 @@ export default function Panel({
         <div className="flex-1 relative">
           <PixelCanvas
             activeColor={selectedColor}
-            initialGrid={initialGrid}
             lastPixelPlaced={lastPixelPlaced}
             username={you?.username!}
           />
