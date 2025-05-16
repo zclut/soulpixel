@@ -4,19 +4,19 @@ const io = require("socket.io")(3000, {
     },
 });
 
-const MAX_USERS = 150;
+const MAX_USERS = 1;
 const connectedUsers = new Map();
 const waitingQueue = [];
 
 io.on("connection", (socket) => {
     socket.on("join", (user_id) => {
-        if (connectedUsers.has(user_id)) {
+        if (connectedUsers.has(user_id) || waitingQueue.some((entry) => entry.user_id === user_id)) {
             socket.emit("joined", {
                 inQueue: true,
                 position: null,
-                reason: "Ya tienes otra pestaña abierta",
+                reason: "already_connected",
             });
-            socket.disconnect(); // Desconecta inmediatamente
+            socket.disconnect(); 
             return;
         }
 
