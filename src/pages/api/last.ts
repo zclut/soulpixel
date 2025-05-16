@@ -14,8 +14,11 @@ export const GET: APIRoute = async ({ locals }) => {
     if (error) {
         return new Response("Error fetching last pixel placed", { status: 500 });
     }
-    if (!data || data.length === 0) {
-        return new Response("No data found", { status: 404 });
+    if (!data) {
+        return new Response(null, {
+            status: 200,
+            headers: { "Content-Type": "application/json" },
+        });
     }
 
     return new Response(JSON.stringify(data), {
