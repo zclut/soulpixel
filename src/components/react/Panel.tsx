@@ -22,10 +22,10 @@ export default function Panel() {
   const { inQueue, position, queued, reason, isReady, connectionFailed } = useQueue(you?.id!);
 
   useEffect(() => {
-    if (connectionFailed) {
+    if (connectionFailed && !reason) {
       window.location.href = "/";
     }
-  }, [connectionFailed]);
+  }, [connectionFailed, reason]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -42,14 +42,18 @@ export default function Panel() {
     fetchData();
   }, [you?.username, isReady, inQueue, reason]);
   
-  if (!you || !you.username) {
+  if (!you || !you.username || !isReady) {
     return;
+  }
+
+  if (loadingData && !inQueue && !reason) {
+    return <WaitingRoom isLoading={true} />;
   }
 
   return (
     <>
-      {inQueue || reason || loadingData ? (
-        <WaitingRoom queued={queued} position={position ?? 1} reason={reason} isLoading={loadingData}/>
+      {inQueue || reason  ? (
+        <WaitingRoom queued={queued} position={position ?? 1} reason={reason} />
       ) : (
         <>
           {/* Main Content */}
