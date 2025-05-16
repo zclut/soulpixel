@@ -1,16 +1,23 @@
 import { SignedIn, UserButton } from "@clerk/astro/react";
 import { Copyright, Info } from "lucide-react";
 import OnlineUsers from "@/components/react/OnlineUsers";
+import { userPixelCounts } from "@/store";
+import { useStore } from "@nanostores/react";
+import { getLevelFromPixels } from "@/lib/utils";
 
 interface Props {
-  user: any;
+  username: string;
 }
 
-const Profile = ({ user }: Props) => {
+const Profile = ({ username }: Props) => {
+  const $userPixelCounts = useStore(userPixelCounts);
+  const userCount = $userPixelCounts.get(username) || 0;
+  const level = getLevelFromPixels(userCount);
+
   const profile = [
-    { id: 1, name: "SOUL", value: user.username },
-    { id: 2, name: "LEVEL", value: "INITIATE" },
-    { id: 3, name: "PIXELS", value: "12,458" },
+    { id: 1, name: "SOUL", value: username },
+    { id: 2, name: "LEVEL", value: level?.text.toUpperCase() },
+    { id: 3, name: "PIXELS", value: userCount },
   ];
 
   return (
@@ -44,8 +51,8 @@ const Profile = ({ user }: Props) => {
           <div className="flex flex-wrap justify-between text-sm w-full">
             {profile.map(({ id, name, value }) => (
               <div key={id} className={`flex w-1/2 items-center gap-1`}>
-                <span className="text-purple-500">{name}:</span>
-                <span className="text-fuchsia-500 truncate">{value}</span>
+                <span className="text-purple-500 font-semibold">{name}:</span>
+                <span className={`${name === "LEVEL" ? level?.color : "text-fuchsia-500"} truncate font-mono`}>{value}</span>
               </div>
             ))}
           </div>

@@ -2,9 +2,8 @@
 import "../styles/global.css";
 // Component Imports
 import Layout from "@/layouts/Layout.astro";
-import { getCurrentGrid, getLastPixelPlaced, getLeaderboard } from "@/lib/supabase";
+import { getCurrentGrid, getLastPixelPlaced } from "@/lib/supabase";
 import Panel from "@/components/react/Panel";
-import Header from "@/components/Header.astro";
 
 const user = await Astro.locals.currentUser();
 
@@ -14,15 +13,13 @@ if (!user || !user?.username) {
 }
 
 const username = user?.username;
-const { data, error } = await getCurrentGrid();
-const { data: initialLeaderboard } = await getLeaderboard();
+const { data } = await getCurrentGrid();
 const { data: lastPixelPlaced } = await getLastPixelPlaced(username)
 ---
 
 <Layout>
   <div class="bg-black text-purple-500 font-mono">
     <Panel 
-      initialLeaderboard={initialLeaderboard ?? []}
       initialGrid={data}
       lastPixelPlaced={lastPixelPlaced[0] ?? null}
       client:load 

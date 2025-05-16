@@ -9,6 +9,8 @@ import { Download, Shrink, ZoomIn, ZoomOut } from "lucide-react";
 import Cooldown from "./Cooldown";
 import { CANVAS_LIMITS, CELL_SIZE, COOLDOWN_DURATION } from "@/lib/const";
 import { getCooldownRemaining } from "@/lib/utils";
+import { grid, type PixelInfo } from "@/store";
+import { useStore } from "@nanostores/react";
 
 interface PixelCanvasProps {
   activeColor: string;
@@ -25,10 +27,8 @@ export default function PixelCanvas({
 }: PixelCanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
-  const [grid, setGrid] = useState<Map<string, string>>(new Map());
-  const [pendingPixels, setPendingPixels] = useState<Map<string, string>>(
-    new Map()
-  );
+  const $grid = useStore(grid)
+  const [pendingPixels, setPendingPixels] = useState<Map<string, PixelInfo>>(new Map());
   const [hoveredCell, setHoveredCell] = useState<{
     x: number;
     y: number;
@@ -41,28 +41,17 @@ export default function PixelCanvas({
     getCooldownRemaining(lastPixelPlaced.created_at ?? null)
   );
 
-  useEffect(() => {
-    const newGrid = new Map<string, string>();
-    initialGrid.forEach(({ x, y, color }) => {
-      newGrid.set(`${x},${y}`, color);
-    });
-    setGrid(newGrid);
-  }, [initialGrid]);
+  // useEffect(() => {
+  //   const newGrid = new Map<string, string>();
+  //   initialGrid.forEach(({ x, y, color }) => {
+  //     newGrid.set(`${x},${y}`, color);
+  //   });
+  //   setGrid(newGrid);
+  // }, [initialGrid]);
 
-  const handleNewPixel = (newPixel: {
-    x: number;
-    y: number;
-    color: string;
-  }) => {
-    const { x, y, color } = newPixel;
+  const handleNewPixel = (newPixel: any) => {
+    const { x, y } = newPixel;
     const key = `${x},${y}`;
-
-    setGrid((prevGrid) => {
-      const newGrid = new Map(prevGrid);
-
-      newGrid.set(key, color);
-      return newGrid;
-    });
 
     setPendingPixels((prev) => {
       const newPending = new Map(prev);
@@ -115,13 +104,13 @@ export default function PixelCanvas({
     ctx.strokeRect(borderX, borderY, borderWidth, borderHeight);
 
     // Optimización: Agrupar píxeles por color para reducir cambios de contexto
-    const combinedGrid = new Map(grid);
+    const combinedGrid = new Map($grid);
     pendingPixels.forEach((color, key) => {
       combinedGrid.set(key, color);
     });
     const pixelsByColor = new Map<string, { x: number; y: number }[]>();
 
-    combinedGrid.forEach((color, key) => {
+    combinedGrid.forEach(({color}, key) => {
       const [x, y] = key.split(",").map(Number);
 
       if (isWithinLimits(x, y)) {
@@ -196,7 +185,7 @@ export default function PixelCanvas({
   // Dibujar el canvas cuando cambian las dependencias
   useEffect(() => {
     drawCanvas();
-  }, [grid, pendingPixels, hoveredCell, offset, zoom]);
+  }, [$grid, pendingPixels, hoveredCell, offset, zoom]);
 
   // Manejar resize del canvas
   useEffect(() => {
@@ -275,7 +264,11 @@ export default function PixelCanvas({
 
       setPendingPixels((prev) => {
         const newPending = new Map(prev);
-        newPending.set(key, activeColor);
+        newPending.set(key, {
+          color: activeColor,
+          user: username,
+          created_at: new Date().toUTCString(),
+        });
         return newPending;
       });
 
@@ -402,12 +395,12 @@ export default function PixelCanvas({
     tempCtx.fillRect(0, 0, width, height);
 
     // Dibujar píxeles
-    const combinedGrid = new Map(grid);
+    const combinedGrid = new Map($grid);
     pendingPixels.forEach((color, key) => {
       combinedGrid.set(key, color);
     });
 
-    combinedGrid.forEach((color, key) => {
+    combinedGrid.forEach(({color}, key) => {
       const [x, y] = key.split(",").map(Number);
       if (x >= minX && x <= maxX && y >= minY && y <= maxY) {
         const drawX = (x - minX) * CELL_SIZE;

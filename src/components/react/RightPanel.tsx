@@ -5,14 +5,13 @@ import Profile from "@/components/react/Profile";
 import { TerminalIcon } from "lucide-react";
 
 interface Props {
-  initialLeaderboard: any[];
   user: any;
 }
 
-const RightPanel = ({ initialLeaderboard, user }: Props) => {
+const RightPanel = ({ user }: Props) => {
   return (
     <div className="w-full md:w-96 h-full flex flex-col gap-2">
-      <Profile user={user} />
+      <Profile username={user.username} />
 
       <div className="border border-purple-900/50 bg-black/80 rounded-sm flex flex-col flex-1 overflow-hidden">
         <div className="p-2 border-b border-purple-900/50 flex justify-between items-center">
@@ -50,8 +49,7 @@ const RightPanel = ({ initialLeaderboard, user }: Props) => {
             </TabsContent>
             <TabsContent value="leaderboard" className="h-full">
               <Leaderboard
-                username={user}
-                initialLeaderboard={initialLeaderboard}
+                username={user.username}
               />
             </TabsContent>
             <TabsContent value="achievements" className="h-full">

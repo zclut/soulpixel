@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Trophy } from "lucide-react";
 import { getLevelFromPixels } from "@/lib/utils";
+import { userPixelCounts } from "@/store";
+import { useStore } from "@nanostores/react";
 
 type LeaderboardEntry = {
   id: number;
@@ -13,23 +15,27 @@ type LeaderboardEntry = {
 };
 
 interface Props {
-  initialLeaderboard: any[];
   username: string;
 }
 
-export default function Leaderboard({ initialLeaderboard, username }: Props) {
+export default function Leaderboard({ username }: Props) {
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
+  const $userPixelCounts = useStore(userPixelCounts);
 
   useEffect(() => {
-    const rankedUsers = initialLeaderboard.map((user, index) => ({
-      ...user,
-      level: getLevelFromPixels(user.total),
+    const rankedUsers = Array.from($userPixelCounts.entries())
+    .sort(([_, a], [__, b]) => b - a)
+    .map(([key, value], index) => ({
+      id: index,
+      level: getLevelFromPixels(value),
       rank: index + 1,
-      isYou: user.user_id === username,
+      total: value,
+      user_id: key,
+      isYou: key === username,
     }));
 
     setLeaderboard(rankedUsers);
-  }, []);
+  }, [$userPixelCounts]);
 
   const getRankIcon = (rank: number) => {
     if (rank === 1) return <Trophy className="h-4 w-4 text-yellow-400" />;

@@ -1,3 +1,4 @@
+import { addPixelToGrid } from "@/store";
 import { addFeedStore } from "@/utils/feed.store";
 import { createClient } from "@supabase/supabase-js";
 
@@ -41,13 +42,6 @@ export const getGridCount = async () => {
     return { count, error };
 };
 
-export const getLeaderboard = async () => {
-    const { data, error } = await supabase
-        .from("leaderboard_view")
-        .select("*")
-    return { data, error };
-};
-
 export const getHistoricalGrid = async () => {
     const { data, error } = await supabase.from("grid").select("*");
     return { data, error };
@@ -83,8 +77,9 @@ export const listenToGridChanges = (callback: Function) => {
             "postgres_changes",
             { event: "*", schema: "public", table: "grid" },
             (payload) => {
+              callback(payload.new);
               addFeedStore(payload.new as any);
-                callback(payload.new);
+              addPixelToGrid(payload.new as any);
             }
         )
         .subscribe();

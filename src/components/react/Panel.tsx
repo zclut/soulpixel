@@ -1,38 +1,42 @@
-import { useState, useSyncExternalStore } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 import Footer from "@/components/Footer";
 import PixelCanvas from "@/components/react/PixelCanvas";
 import { $userStore } from "@clerk/astro/client";
 import RightPanel from "@/components/react/RightPanel";
 import useIsMobile from "@/hooks/useIsMobile";
+import { setInitialGrid } from "@/store";
 
 interface Props {
   initialGrid: any[];
-  initialLeaderboard: any[];
   lastPixelPlaced: any;
 }
 
 export default function Panel({
   initialGrid,
-  initialLeaderboard,
   lastPixelPlaced,
 }: Props) {
   const [selectedColor, setSelectedColor] = useState("#FFFFFF");
+  const isMobile = useIsMobile();
   const you = useSyncExternalStore(
     $userStore.listen,
     $userStore.get,
     $userStore.get
   );
 
-  const isMobile = useIsMobile();
+  useEffect(() => {
+    setInitialGrid(initialGrid);
+  }, []);
+
   if (!you || !you.username) {
     return;
   }
+
   return (
     <>
       {/* Main Content */}
       {isMobile && (
         <div className="flex flex-col md:h-[calc(100vh-49px)] h-[60vh] p-2">
-          <RightPanel initialLeaderboard={initialLeaderboard} user={you} />
+          <RightPanel user={you} />
         </div>
       )}
 
@@ -49,7 +53,7 @@ export default function Panel({
 
         {/* Right Panel  */}
         {!isMobile && (
-          <RightPanel initialLeaderboard={initialLeaderboard} user={you} />
+          <RightPanel user={you} />
         )}
       </div>
 
