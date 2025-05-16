@@ -53,7 +53,7 @@ export default function PixelCanvas({
   useEffect(() => {
     listenToGridChanges((newPixel: any) => {
       handleNewPixel(newPixel);
-    });
+    }, username);
   }, []);
 
   // Función para dibujar el canvas

@@ -26,6 +26,10 @@ export type Pixel = {
   uuid?: string;
 };
 
+// Users
+export const onlineUsers = atom<number>(0);
+export const setOnlineUsers = (count: number) => onlineUsers.set(count);
+
 // Feed
 export const feedList = atom<Pixel[]>([]);
 

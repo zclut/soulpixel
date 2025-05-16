@@ -1,4 +1,4 @@
-import { addPixelToGrid } from "@/store";
+import { addPixelToGrid, setOnlineUsers } from "@/store";
 import { addFeedStore } from "@/utils/feed.store";
 import { createClient } from "@supabase/supabase-js";
 
@@ -49,7 +49,7 @@ export const getHistoricalGrid = async () => {
 
 export const getLastPixelPlaced = async (user_id: string) => {
     const { data, error } = await supabase
-        .rpc("get_last_pixel_by_user", { 
+        .rpc("get_last_pixel_by_user", {
             user_id,
         }).limit(1);
     return { data, error };
@@ -70,18 +70,39 @@ export const insertPixel = async (
 };
 
 // REALTIME
-export const listenToGridChanges = (callback: Function) => {
+export const listenToGridChanges = (callback: Function, user_id: string) => {
     const channel = supabase
-        .channel("custom-all-channel")
+        .channel("custom-all-channel",
+            {
+                config: {
+                    presence: {
+                        key: user_id
+                    },
+                },
+            }
+        )
         .on(
             "postgres_changes",
             { event: "*", schema: "public", table: "grid" },
             (payload) => {
-              callback(payload.new);
-              addFeedStore(payload.new as any);
-              addPixelToGrid(payload.new as any);
+                callback(payload.new);
+                addFeedStore(payload.new as any);
+                addPixelToGrid(payload.new as any);
             }
         )
-        .subscribe();
+        .on(
+            "presence",
+            { event: "sync" }, 
+            () => {
+                const state = channel.presenceState();
+                const total = Object.keys(state).length;
+                setOnlineUsers(total);
+            }
+        )
+        .subscribe(async (status) => {
+            if (status === "SUBSCRIBED") {
+                await channel.track({});
+            }
+        });
     return channel;
 };
