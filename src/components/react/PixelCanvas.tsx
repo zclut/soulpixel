@@ -1,6 +1,5 @@
 import { listenToGridChanges } from "@/lib/supabase";
 import { insertPixel } from "@/services/api";
-import { addFeedStore } from "@/utils/feed.store";
 import type React from "react";
 
 import { useState, useEffect, useRef } from "react";
@@ -9,19 +8,21 @@ import { Download, Shrink, ZoomIn, ZoomOut } from "lucide-react";
 import Cooldown from "./Cooldown";
 import { CANVAS_LIMITS, CELL_SIZE, COOLDOWN_DURATION } from "@/lib/const";
 import { getCooldownRemaining } from "@/lib/utils";
-import { grid, type PixelInfo } from "@/store";
+import { grid, setInitialGrid, type PixelInfo } from "@/store";
 import { useStore } from "@nanostores/react";
 
 interface PixelCanvasProps {
   activeColor: string;
   username: string;
   lastPixelPlaced: any;
+  initialGrid: any[];
 }
 
 export default function PixelCanvas({
   activeColor,
   lastPixelPlaced,
   username,
+  initialGrid,
 }: PixelCanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -38,6 +39,10 @@ export default function PixelCanvas({
   const [cooldown, setCooldown] = useState(
     getCooldownRemaining(lastPixelPlaced.created_at ?? null)
   );
+
+  useEffect(() => {
+    setInitialGrid(initialGrid);
+  }, []);
 
   const handleNewPixel = (newPixel: any) => {
     const { x, y } = newPixel;
