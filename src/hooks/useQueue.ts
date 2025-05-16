@@ -1,5 +1,3 @@
-// useQueue.ts
-import { setOnlineUsers } from "@/store";
 import { useEffect, useState } from "react";
 import { io, Socket } from "socket.io-client";
 
@@ -13,13 +11,12 @@ export const useQueue = (user_id: string | null) => {
     const [queued, setQueued] = useState(0);
     const [reason, setReason] = useState<string | null>(null);
     const [isReady, setIsReady] = useState(false);
+    const [connectionFailed, setConnectionFailed] = useState(false);
 
     useEffect(() => {
         if (!user_id) return;
 
-        if (!socket) {
-            socket = io(PUBLIC_WS_QUEUE_URL);
-        }
+        socket = io(PUBLIC_WS_QUEUE_URL);
 
         socket.emit("join", user_id);
 
@@ -38,8 +35,15 @@ export const useQueue = (user_id: string | null) => {
 
         socket.on("user_count", ({ connected, queued }) => {
             setConnected(connected);
-            setOnlineUsers(connected);
             setQueued(queued);
+        });
+
+        socket.on("connect_error", () => {
+            setConnectionFailed(true);
+        });
+
+        socket.on("disconnect", () => {
+            setConnectionFailed(true);
         });
 
         return () => {
@@ -48,5 +52,5 @@ export const useQueue = (user_id: string | null) => {
         };
     }, [user_id]);
 
-    return { inQueue, position, connected, queued, reason, isReady };
+    return { inQueue, position, connected, queued, reason, isReady, connectionFailed };
 };

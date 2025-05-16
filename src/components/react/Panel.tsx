@@ -1,4 +1,4 @@
-import { useState, useSyncExternalStore } from "react";
+import { useState, useSyncExternalStore, useEffect } from "react";
 import Footer from "@/components/Footer";
 import PixelCanvas from "@/components/react/PixelCanvas";
 import { $userStore } from "@clerk/astro/client";
@@ -7,12 +7,7 @@ import useIsMobile from "@/hooks/useIsMobile";
 import { useQueue } from "@/hooks/useQueue";
 import WaitingRoom from "./WaitingRoom";
 
-interface Props {
-  initialGrid: any[];
-  lastPixelPlaced: any;
-}
-
-export default function Panel({ initialGrid, lastPixelPlaced }: Props) {
+export default function Panel() {
   const [selectedColor, setSelectedColor] = useState("#FFFFFF");
   const isMobile = useIsMobile();
   const you = useSyncExternalStore(
@@ -20,16 +15,23 @@ export default function Panel({ initialGrid, lastPixelPlaced }: Props) {
     $userStore.get,
     $userStore.get
   );
-  const { inQueue, position, queued, reason, isReady } = useQueue(you?.id!);
-  
+  const { inQueue, position, queued, reason, isReady, connectionFailed } =
+    useQueue(you?.id!);
+
+  useEffect(() => {
+    if (connectionFailed) {
+      window.location.href = "/";
+    }
+  }, [connectionFailed]);
+
   if (!you || !you.username || !isReady) {
-    return; 
+    return;
   }
 
   return (
     <>
       {inQueue || reason ? (
-        <WaitingRoom queued={queued} position={position ?? 1} reason={reason}/>
+        <WaitingRoom queued={queued} position={position ?? 1} reason={reason} />
       ) : (
         <>
           {/* Main Content */}
@@ -44,9 +46,7 @@ export default function Panel({ initialGrid, lastPixelPlaced }: Props) {
             <div className="flex-1 relative">
               <PixelCanvas
                 activeColor={selectedColor}
-                lastPixelPlaced={lastPixelPlaced}
                 username={you?.username!}
-                initialGrid={initialGrid}
               />
             </div>
 
