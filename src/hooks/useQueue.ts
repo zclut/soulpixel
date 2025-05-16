@@ -17,7 +17,9 @@ export const useQueue = (user_id: string | null) => {
     useEffect(() => {
         if (!user_id) return;
 
-        socket = io(PUBLIC_WS_QUEUE_URL);
+        socket = io(PUBLIC_WS_QUEUE_URL, {
+            path: "/socket.io"
+        });
 
         socket.emit("join", user_id);
 
