@@ -90,19 +90,6 @@ export const listenToGridChanges = (callback: Function, user_id: string) => {
                 addPixelToGrid(payload.new as any);
             }
         )
-        .on(
-            "presence",
-            { event: "sync" }, 
-            () => {
-                const state = channel.presenceState();
-                const total = Object.keys(state).length;
-                setOnlineUsers(total);
-            }
-        )
-        .subscribe(async (status) => {
-            if (status === "SUBSCRIBED") {
-                await channel.track({});
-            }
-        });
+        .subscribe();
     return channel;
 };

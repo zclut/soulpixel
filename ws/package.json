@@ -1,0 +1,17 @@
+{
+  "name": "soulpixel-ws-queue",
+  "version": "1.0.0",
+  "description": "SoulPixel Websocket Queue",
+  "main": "index.js",
+  "scripts": {
+    "dev": "node index.js"
+  },
+  "keywords": [
+    "soulpixel"
+  ],
+  "author": "zClut|klasinky",
+  "license": "MIT",
+  "dependencies": {
+    "socket.io": "^4.8.1"
+  }
+}

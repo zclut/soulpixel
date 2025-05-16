@@ -1,20 +1,18 @@
-import { useEffect, useState, useSyncExternalStore } from "react";
+import { useState, useSyncExternalStore } from "react";
 import Footer from "@/components/Footer";
 import PixelCanvas from "@/components/react/PixelCanvas";
 import { $userStore } from "@clerk/astro/client";
 import RightPanel from "@/components/react/RightPanel";
 import useIsMobile from "@/hooks/useIsMobile";
-import { setInitialGrid } from "@/store";
+import { useQueue } from "@/hooks/useQueue";
+import WaitingRoom from "./WaitingRoom";
 
 interface Props {
   initialGrid: any[];
   lastPixelPlaced: any;
 }
 
-export default function Panel({
-  initialGrid,
-  lastPixelPlaced,
-}: Props) {
+export default function Panel({ initialGrid, lastPixelPlaced }: Props) {
   const [selectedColor, setSelectedColor] = useState("#FFFFFF");
   const isMobile = useIsMobile();
   const you = useSyncExternalStore(
@@ -22,41 +20,46 @@ export default function Panel({
     $userStore.get,
     $userStore.get
   );
-
-  useEffect(() => {
-    setInitialGrid(initialGrid);
-  }, []);
-
-  if (!you || !you.username) {
-    return;
+  const { inQueue, position, queued, reason, isReady } = useQueue(you?.id!);
+  
+  if (!you || !you.username || !isReady) {
+    return; 
   }
 
   return (
     <>
-      {/* Main Content */}
-      {isMobile && (
-        <div className="flex flex-col md:h-[calc(100vh-49px)] h-[60vh] p-2">
-          <RightPanel user={you} />
-        </div>
-      )}
+      {inQueue || reason ? (
+        <WaitingRoom queued={queued} position={position ?? 1} reason={reason}/>
+      ) : (
+        <>
+          {/* Main Content */}
+          {isMobile && (
+            <div className="flex flex-col md:h-[calc(100vh-49px)] h-[60vh] p-2">
+              <RightPanel user={you} />
+            </div>
+          )}
 
-      <div className="h-[50vh] md:h-[calc(100vh-49px)] flex-1 flex flex-col md:flex-row gap-2 p-2">
-        {/*  Canvas */}
-        <div className="flex-1 relative">
-          <PixelCanvas
-            activeColor={selectedColor}
-            lastPixelPlaced={lastPixelPlaced}
-            username={you?.username!}
+          <div className="h-[50vh] md:h-[calc(100vh-49px)] flex-1 flex flex-col md:flex-row gap-2 p-2">
+            {/*  Canvas */}
+            <div className="flex-1 relative">
+              <PixelCanvas
+                activeColor={selectedColor}
+                lastPixelPlaced={lastPixelPlaced}
+                username={you?.username!}
+                initialGrid={initialGrid}
+              />
+            </div>
+
+            {/* Right Panel  */}
+            {!isMobile && <RightPanel user={you} />}
+          </div>
+
+          <Footer
+            selectedColor={selectedColor}
+            onColorChange={setSelectedColor}
           />
-        </div>
-
-        {/* Right Panel  */}
-        {!isMobile && (
-          <RightPanel user={you} />
-        )}
-      </div>
-
-      <Footer selectedColor={selectedColor} onColorChange={setSelectedColor} />
+        </>
+      )}
     </>
   );
 }
