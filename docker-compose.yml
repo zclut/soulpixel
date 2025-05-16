@@ -5,7 +5,7 @@ services:
     container_name: astro-app
     restart: unless-stopped
     environment:
-      PUBLIC_WS_QUEUE_URL: wss://queue:3000
+      PUBLIC_WS_QUEUE_URL: wss://soulpixel.klasinky.com:3000
     ports:
       - "4321:4321"
 
