@@ -1,3 +1,4 @@
+import { setOnlineUsers } from "@/store";
 import { useEffect, useState } from "react";
 import { io, Socket } from "socket.io-client";
 
@@ -36,6 +37,7 @@ export const useQueue = (user_id: string | null) => {
         socket.on("user_count", ({ connected, queued }) => {
             setConnected(connected);
             setQueued(queued);
+            setOnlineUsers(connected);
         });
 
         socket.on("connect_error", () => {

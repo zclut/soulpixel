@@ -1,4 +1,4 @@
-import { getCurrentGrid, getLastPixelPlaced, listenToGridChanges } from "@/lib/supabase";
+import { listenToGridChanges } from "@/lib/supabase";
 import { insertPixel } from "@/services/api";
 import type React from "react";
 
@@ -14,11 +14,15 @@ import { useStore } from "@nanostores/react";
 interface PixelCanvasProps {
   activeColor: string;
   username: string;
+  lastPixelPlaced: any;
+  initialGrid: any[];
 }
 
 export default function PixelCanvas({
   activeColor,
+  lastPixelPlaced,
   username,
+  initialGrid,
 }: PixelCanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -32,17 +36,12 @@ export default function PixelCanvas({
   const [lastPosition, setLastPosition] = useState({ x: 0, y: 0 });
   const [offset, setOffset] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
-
-  const [cooldown, setCooldown] = useState(0);
+  const [cooldown, setCooldown] = useState(
+    getCooldownRemaining(lastPixelPlaced.created_at ?? null)
+  );
 
   useEffect(() => {
-    const getInitialData = async () => {
-      const { data: initialGrid } = await getCurrentGrid();
-      const { data: lastPixelPlaced } = await getLastPixelPlaced(username)
-      setInitialGrid(initialGrid);
-      setCooldown(getCooldownRemaining(lastPixelPlaced.created_at ?? null));
-    };
-    getInitialData();
+    setInitialGrid(initialGrid);
   }, []);
 
   const handleNewPixel = (newPixel: any) => {

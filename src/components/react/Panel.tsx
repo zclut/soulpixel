@@ -6,17 +6,20 @@ import RightPanel from "@/components/react/RightPanel";
 import useIsMobile from "@/hooks/useIsMobile";
 import { useQueue } from "@/hooks/useQueue";
 import WaitingRoom from "./WaitingRoom";
+import { getCurrentGrid, getLastPixelPlaced } from '@/lib/supabase';
 
 export default function Panel() {
   const [selectedColor, setSelectedColor] = useState("#FFFFFF");
+  const [initialGrid, setInitialGrid] = useState<any[]>([]);
+  const [lastPixelPlaced, setLastPixelPlaced] = useState();
+  const [loadingData, setLoadingData] = useState(true);
   const isMobile = useIsMobile();
   const you = useSyncExternalStore(
     $userStore.listen,
     $userStore.get,
     $userStore.get
   );
-  const { inQueue, position, queued, reason, isReady, connectionFailed } =
-    useQueue(you?.id!);
+  const { inQueue, position, queued, reason, isReady, connectionFailed } = useQueue(you?.id!);
 
   useEffect(() => {
     if (connectionFailed) {
@@ -24,14 +27,29 @@ export default function Panel() {
     }
   }, [connectionFailed]);
 
-  if (!you || !you.username || !isReady) {
+  useEffect(() => {
+    const fetchData = async () => {
+      if (!you?.username || !isReady || inQueue || reason) return;
+
+      setLoadingData(true);
+      const { data: grid } = await getCurrentGrid();
+      const { data: pixel } = await getLastPixelPlaced(you.username);
+      setInitialGrid(grid);
+      setLastPixelPlaced(pixel);
+      setLoadingData(false);
+    };
+
+    fetchData();
+  }, [you?.username, isReady, inQueue, reason]);
+  
+  if (!you || !you.username) {
     return;
   }
 
   return (
     <>
-      {inQueue || reason ? (
-        <WaitingRoom queued={queued} position={position ?? 1} reason={reason} />
+      {inQueue || reason || loadingData ? (
+        <WaitingRoom queued={queued} position={position ?? 1} reason={reason} isLoading={loadingData}/>
       ) : (
         <>
           {/* Main Content */}
@@ -45,6 +63,8 @@ export default function Panel() {
             {/*  Canvas */}
             <div className="flex-1 relative">
               <PixelCanvas
+                initialGrid={initialGrid}
+                lastPixelPlaced={lastPixelPlaced}
                 activeColor={selectedColor}
                 username={you?.username!}
               />

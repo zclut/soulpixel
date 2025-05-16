@@ -1,27 +1,34 @@
 import ParticleBackground from "./ParticleBackground";
 
 interface Props {
-  queued: number;
-  position: number;
-  reason: string | null;
+  queued?: number;
+  position?: number;
+  reason?: string | null;
+  isLoading?: boolean | null;
 }
 
-const WaitingRoom = ({ queued, position, reason }: Props) => {
-  const title =
-    reason == "already_connected"
+const WaitingRoom = ({ queued, position, reason, isLoading }: Props) => {
+  const title = isLoading
+    ? "¡Loading!"
+    : reason == "already_connected"
       ? "¡Signal conflict detected!"
       : "¡Welcome to the waiting room!";
+
   const description =
-    reason == "already_connected" ? (
-      "Another portal is open."
-    ) : (
-      <>
-        Position:{" "}
-        <span className="text-yellow-400">
-          {position} of {queued}
-        </span> — Establishing your link with the souls...
-      </>
-    );
+    isLoading
+      ? "Please wait while we collect all the souls..."
+      : reason == "already_connected" ? (
+        "Another portal is open."
+      ) : (
+        <>
+          Position:{" "}
+          <span className="text-yellow-400">
+            {position} of {queued}
+          </span>{" "}
+          — Establishing your link with the souls...
+        </>
+      );
+
   const footer =
     reason == "already_connected"
       ? "Close this tab to synchronize your presence."
