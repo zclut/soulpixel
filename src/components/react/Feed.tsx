@@ -1,9 +1,13 @@
-import { useEffect, useRef } from "react";
+import { useRef } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useStore } from "@nanostores/react";
 import { feedList } from "@/store";
 
-export default function Feed() {
+interface Props {
+  username: string;
+}
+
+export default function Feed({ username }: Props) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const $feedList = useStore(feedList);
 
@@ -24,10 +28,12 @@ export default function Feed() {
           >
             <span className="text-fuchsia-500">
               <span className="text-purple-700 ">
-                {`[${feed.created_at}] ${feed.user}: `}
+                {`[${feed.created_at}] `}{" "}
+              </span>{" "}
+              <span className="text-yellow-500 ">
+                {`${feed.user}${username == feed.user ? " (you)" : ""}: `}
               </span>
               {feed.message}
-
               <span className="ml-1 text-yellow-500 ">
                 ({feed.x} {feed.y})
               </span>

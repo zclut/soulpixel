@@ -3,6 +3,7 @@ import Leaderboard from "@/components/react/Leaderboard";
 import Feed from "@/components/react/Feed";
 import Profile from "@/components/react/Profile";
 import { TerminalIcon } from "lucide-react";
+import Achievement from "./Achievement";
 
 interface Props {
   user: any;
@@ -45,15 +46,13 @@ const RightPanel = ({ user }: Props) => {
 
           <div className="flex-1 overflow-hidden">
             <TabsContent value="feed" className="h-full">
-              <Feed />
+              <Feed username={user.username} />
             </TabsContent>
             <TabsContent value="leaderboard" className="h-full">
-              <Leaderboard
-                username={user.username}
-              />
+              <Leaderboard username={user.username} />
             </TabsContent>
             <TabsContent value="achievements" className="h-full">
-              <div className="p-2 font-mono text-xs">Achievements content</div>
+              <Achievement username={user.username} />
             </TabsContent>
           </div>
         </Tabs>
