@@ -6,7 +6,7 @@ import RightPanel from "@/components/react/RightPanel";
 import useIsMobile from "@/hooks/useIsMobile";
 import { useQueue } from "@/hooks/useQueue";
 import WaitingRoom from "./WaitingRoom";
-import { getCurrentGrid, getLastPixelPlaced } from '@/lib/supabase';
+import { getCurrentGrid, getLastPixelPlaced } from '@/services/api';
 
 export default function Panel() {
   const [selectedColor, setSelectedColor] = useState("#FFFFFF");
@@ -32,8 +32,8 @@ export default function Panel() {
       if (!you?.username || !isReady || inQueue || reason) return;
 
       setLoadingData(true);
-      const { data: grid } = await getCurrentGrid();
-      const { data: pixel } = await getLastPixelPlaced(you.username);
+      const grid = await getCurrentGrid();
+      const pixel = await getLastPixelPlaced();
       setInitialGrid(grid);
       setLastPixelPlaced(pixel);
       setLoadingData(false);
