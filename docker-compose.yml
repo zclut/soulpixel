@@ -4,5 +4,5 @@ services:
       context: .
     container_name: astro-app
     restart: unless-stopped
-    expose:
-      - "4321"
+    ports:
+      - "4321:4321"
