@@ -19,4 +19,9 @@ jobs:
 
       - name: Run command on VPS
         run: |
-          ssh ${{secrets.SSH_USER}}@${{secrets.SSH_HOST}} -p ${{secrets.SSH_PORT}} "ls -l"
+          ssh -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
+          cd astro/pixel
+          git pull origin main
+          docker compose up -d --build
+          systemctl restart nginx
+          EOF
