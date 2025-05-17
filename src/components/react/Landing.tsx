@@ -26,7 +26,7 @@ export default function LandingPage() {
   }, [typedText, isTyping]);
 
   return (
-    <section className="relative flex flex-col items-center justify-center min-h-screen w-full overflow-hidden bg-gradient-radial from-[#120a1a] via-[#0a0a1a] to-[#050510] text-gray-300">
+    <section className="relative flex flex-col items-center justify-center min-h-screen w-full overflow-hidden bg-gradient-radial from-[#120a1a] via-[#0a0a1a] to-[#050510]">
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         {[...Array(5)].map((_, i) => (
           <motion.div

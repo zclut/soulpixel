@@ -32,11 +32,11 @@ export default function Panel() {
       if (!you?.username || !isReady || inQueue || reason) return;
 
       setLoadingData(true);
-      const grid = await getCurrentGrid();
-      const pixel = await getLastPixelPlaced();
-      setInitialGrid(grid);
-      setLastPixelPlaced(pixel);
-      setLoadingData(false);
+      // const grid = await getCurrentGrid();
+      // const pixel = await getLastPixelPlaced();
+      // setInitialGrid(grid);
+      // setLastPixelPlaced(pixel);
+      // setLoadingData(false);
     };
 
     fetchData();
