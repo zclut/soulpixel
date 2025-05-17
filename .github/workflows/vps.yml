@@ -24,4 +24,5 @@ jobs:
           git pull origin main
           docker compose up -d --build
           systemctl restart nginx
+          docker system prune -f
           EOF
