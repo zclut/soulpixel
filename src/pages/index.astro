@@ -2,8 +2,21 @@
 import "../styles/global.css";
 import Layout from "@/layouts/Layout.astro";
 import LandingPage from "@/components/react/Landing";
+import Background from "@/components/Background.astro";
+import Timelapse from "@/components/react/Timelapse";
+import Collective from "@/components/react/Collective";
+import Creators from "@/components/react/Creators";
 ---
 
 <Layout>
+  <Background />
+
+  <!-- Landing -->
   <LandingPage client:load />
+
+  <Timelapse client:load />
+
+  <Collective client:load />
+
+  <Creators client:load />
 </Layout>

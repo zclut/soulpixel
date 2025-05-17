@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
-import ParticleBackground from "@/components/react/ParticleBackground";
 import {
   SignInButton,
   SignedIn,
@@ -27,9 +26,7 @@ export default function LandingPage() {
   }, [typedText, isTyping]);
 
   return (
-    <div className="relative flex flex-col items-center justify-center min-h-screen w-full overflow-hidden bg-gradient-radial from-[#120a1a] via-[#0a0a1a] to-[#050510] text-gray-300">
-      <ParticleBackground />
-
+    <section className="relative flex flex-col items-center justify-center min-h-screen w-full overflow-hidden bg-gradient-radial from-[#120a1a] via-[#0a0a1a] to-[#050510] text-gray-300">
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         {[...Array(5)].map((_, i) => (
           <motion.div
@@ -69,7 +66,7 @@ export default function LandingPage() {
           transition={{ duration: 1.5 }}
           className="mb-12 relative"
         >
-          <div className="absolute -inset-1 bg-purple-900/20 rounded-lg blur-xl opacity-70 animate-pulse-slow"></div>
+          <div className="absolute -inset-1 animate-pulse-slow"></div>
           <h1 className="font-mono text-xl sm:text-2xl md:text-3xl whitespace-pre-line leading-relaxed tracking-wider relative">
             {typedText}
             {isTyping && <span className="animate-pulse">|</span>}
@@ -108,6 +105,6 @@ export default function LandingPage() {
       <div className="absolute bottom-4 left-0 right-0 text-center text-xs text-gray-500 font-mono">
         <p>SoulPixel © {new Date().getFullYear()}</p>
       </div>
-    </div>
+    </section>
   );
 }
