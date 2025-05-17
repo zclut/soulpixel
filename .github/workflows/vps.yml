@@ -1,0 +1,22 @@
+name: Deploy to VPS
+
+on:
+#   push:
+#     branches:
+#       - main
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan ${{ secrets.SSH_HOST}} >> ~/.ssh/known_hosts
+
+      - name: Run command on VPS
+        run: |
+          ssh ${{secrets.SSH_USER}}@${{secrets.SSH_HOST}} -p ${{secrets.SSH_PORT}} "ls -l"
