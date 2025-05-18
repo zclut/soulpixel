@@ -1,23 +1,27 @@
+import { $userStore } from "@clerk/astro/client";
+import { getCooldownRemaining } from "@/lib/utils";
+import { getCurrentGrid, getLastPixelPlaced } from "@/services/api";
+import { selectedColor } from "@/store";
+import { useQueue } from "@/hooks/useQueue";
 import { useState, useSyncExternalStore, useEffect } from "react";
+import { useStore } from "@nanostores/react";
 import Footer from "@/components/Footer";
 import PixelCanvas from "@/components/react/PixelCanvas";
-import { $userStore } from "@clerk/astro/client";
 import RightPanel from "@/components/react/RightPanel";
-import useIsMobile from "@/hooks/useIsMobile";
-import { useQueue } from "@/hooks/useQueue";
-import WaitingRoom from "./WaitingRoom";
-import { getCurrentGrid, getLastPixelPlaced } from "@/services/api";
 import useIsAdmin from "@/hooks/userIsAdmin";
-import { getCooldownRemaining } from "@/lib/utils";
+import useIsMobile from "@/hooks/useIsMobile";
+import WaitingRoom from "./WaitingRoom";
 
 export default function Panel() {
+  // State
+  const $selectedColor = useStore(selectedColor);
+
   const you = useSyncExternalStore(
     $userStore.listen,
     $userStore.get,
     $userStore.get
   );
   const [cooldown, setCooldown] = useState(0);
-  const [selectedColor, setSelectedColor] = useState("#FFFFFF");
   const [initialGrid, setInitialGrid] = useState<any[]>([]);
   const [loadingData, setLoadingData] = useState(true);
   const isMobile = useIsMobile();
@@ -82,7 +86,7 @@ export default function Panel() {
                 initialGrid={initialGrid}
                 cooldown={cooldown}
                 setCooldown={setCooldown}
-                activeColor={selectedColor}
+                activeColor={$selectedColor}
                 username={you?.username!}
               />
             </div>
@@ -92,8 +96,10 @@ export default function Panel() {
           </div>
 
           <Footer
-            selectedColor={selectedColor}
-            onColorChange={setSelectedColor}
+            selectedColor={$selectedColor}
+            onColorChange={(color: string) => {
+              selectedColor.set(color);
+            }}
           />
         </>
       )}

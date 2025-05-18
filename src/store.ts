@@ -32,6 +32,7 @@ export const setOnlineUsers = (count: number) => onlineUsers.set(count);
 
 // Feed
 export const feedList = atom<Pixel[]>([]);
+export const selectedColor = atom<string>("#FFFFFF");
 
 // Grid
 export const grid = atom<Map<string, PixelInfo>>(new Map());

@@ -4,6 +4,8 @@ import Feed from "@/components/react/Feed";
 import Profile from "@/components/react/Profile";
 import { TerminalIcon } from "lucide-react";
 import Achievement from "./Achievement";
+import { useState } from "react";
+import TimelapseDialog from "./TimelapseDialog";
 
 interface Props {
   user: any;
@@ -22,7 +24,6 @@ const RightPanel = ({ user, cooldown }: Props) => {
             COMMUNICATION TERMINAL
           </div>
         </div>
-
         <Tabs defaultValue="feed" className="flex flex-col h-full">
           <TabsList className="bg-black border-b border-purple-900/50 rounded-none h-8 w-full shrink-0">
             <TabsTrigger
@@ -57,6 +58,7 @@ const RightPanel = ({ user, cooldown }: Props) => {
             </TabsContent>
           </div>
         </Tabs>
+        <TimelapseDialog />
       </div>
     </div>
   );
