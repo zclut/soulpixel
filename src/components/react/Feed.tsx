@@ -46,7 +46,7 @@ export default function Feed({ username }: Props) {
                     ({feed.x} {feed.y})
                   </span>
                   <span
-                    className="ml-1 w-3 h-3 rounded-md mt-1"
+                    className="ml-1 w-3 h-3 rounded-md mt-1 border border-gray-800"
                     style={{ backgroundColor: feed.color }}
                   >
                     &nbsp;&nbsp;
