@@ -24,3 +24,9 @@ pnpm-debug.log*
 .idea/
 
 .python/*
+
+*.txt
+*.csv
+*.mp4
+venv/
+env/
