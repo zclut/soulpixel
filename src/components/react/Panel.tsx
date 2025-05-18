@@ -7,9 +7,13 @@ import useIsMobile from "@/hooks/useIsMobile";
 import { useQueue } from "@/hooks/useQueue";
 import WaitingRoom from "./WaitingRoom";
 import { getCurrentGrid, getLastPixelPlaced } from "@/services/api";
+import { useStore } from "@nanostores/react";
+import { selectedColor } from "@/store";
 
 export default function Panel() {
-  const [selectedColor, setSelectedColor] = useState("#FFFFFF");
+  // State
+  const $selectedColor = useStore(selectedColor);
+
   const [initialGrid, setInitialGrid] = useState<any[]>([]);
   const [lastPixelPlaced, setLastPixelPlaced] = useState();
   const [loadingData, setLoadingData] = useState(true);
@@ -70,7 +74,7 @@ export default function Panel() {
               <PixelCanvas
                 initialGrid={initialGrid}
                 lastPixelPlaced={lastPixelPlaced}
-                activeColor={selectedColor}
+                activeColor={$selectedColor}
                 username={you?.username!}
               />
             </div>
@@ -80,8 +84,10 @@ export default function Panel() {
           </div>
 
           <Footer
-            selectedColor={selectedColor}
-            onColorChange={setSelectedColor}
+            selectedColor={$selectedColor}
+            onColorChange={(color: string) => {
+              selectedColor.set(color);
+            }}
           />
         </>
       )}

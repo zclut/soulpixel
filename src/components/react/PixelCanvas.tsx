@@ -205,7 +205,9 @@ export default function PixelCanvas({
 
   useEffect(() => {
     const preventScroll = (e: Event) => {
-      e.preventDefault();
+      try {
+        e.preventDefault();
+      } catch (error) {}
     };
 
     const container = containerRef.current;
@@ -333,7 +335,9 @@ export default function PixelCanvas({
   };
 
   const handleWheel = (e: React.WheelEvent<HTMLCanvasElement>) => {
-    e.preventDefault();
+    try {
+      e.preventDefault();
+    } catch (error) {}
 
     const delta = -e.deltaY * 0.001;
     const newZoom = Math.max(0.1, Math.min(10, zoom + delta * zoom));
