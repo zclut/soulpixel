@@ -1,24 +1,44 @@
 import { SignedIn, UserButton } from "@clerk/astro/react";
 import { Copyright, Info } from "lucide-react";
 import OnlineUsers from "@/components/react/OnlineUsers";
-import { userPixelCounts } from "@/store";
+import { userPixelCounts, userStats } from "@/store";
 import { useStore } from "@nanostores/react";
-import { getLevelFromPixels } from "@/lib/utils";
+import { getFormattedTime, getLevelFromPixels } from "@/lib/utils";
+import { getAchievementsUpToPixels } from "@/utils/achievements.utils";
 
 interface Props {
   username: string;
+  cooldown: number;
 }
 
-const Profile = ({ username }: Props) => {
+const Profile = ({ username, cooldown }: Props) => {
   const $userPixelCounts = useStore(userPixelCounts);
+  const $userStats = userStats(username);
   const userCount = $userPixelCounts.get(username) || 0;
   const level = getLevelFromPixels(userCount);
+  const { totalSouls, uniqueColors, rank } = useStore($userStats);
+
+  const userAchievements = getAchievementsUpToPixels(
+    totalSouls,
+    uniqueColors,
+    rank
+  ).filter((achievement) => achievement.unlocked).length;
 
   const profile = [
-    { id: 1, name: "SOUL", value: username },
-    { id: 2, name: "LEVEL", value: level?.text.toUpperCase() },
-    { id: 3, name: "PIXELS", value: userCount },
+    { id: 1, name: "TAG", value: username },
+    { id: 2, name: "RANK", value: level?.text.toUpperCase() },
+    { id: 3, name: "SOULS", value: userCount },
+    { id: 4, name: "ACHIEVEMENTS", value: userAchievements },
+    { id: 5, name: "COOLDOWN", value: cooldown > 0 ? getFormattedTime(cooldown) : "Place it!" },
   ];
+
+  const PROFILE_STYLES = {
+    TAG: { color: "text-fuchsia-500" },
+    RANK: { color: level?.color },
+    SOULS: { color: "text-fuchsia-500" },
+    ACHIEVEMENTS: { color: "text-yellow-500" },
+    COOLDOWN: { color: "text-fuchsia-500" },
+  }
 
   return (
     <div className="border border-purple-900/50 bg-black/80 rounded-sm overflow-hidden">
@@ -50,9 +70,9 @@ const Profile = ({ username }: Props) => {
           </div>
           <div className="flex flex-wrap justify-between text-sm w-full">
             {profile.map(({ id, name, value }) => (
-              <div key={id} className={`flex w-1/2 items-center gap-1`}>
+              <div key={id} className={`flex w-1/2 items-center gap-1 align-middle`}>
                 <span className="text-purple-500 font-semibold">{name}:</span>
-                <span className={`${name === "LEVEL" ? level?.color : "text-fuchsia-500"} truncate font-mono`}>{value}</span>
+                <span className={`${PROFILE_STYLES[name as keyof typeof PROFILE_STYLES].color} truncate font-mono text-xs`}>{value}</span>
               </div>
             ))}
           </div>

@@ -50,8 +50,8 @@ export default function Leaderboard({ username }: Props) {
         <div className="grid grid-cols-12 gap-2 text-purple-700 border-b border-purple-900/50 pb-1 mb-2">
           <div className="col-span-1">#</div>
           <div className="col-span-5">USER</div>
-          <div className="col-span-3 text-right">PIXELS</div>
-          <div className="col-span-3 text-right">LEVEL</div>
+          <div className="col-span-2 text-right">PIXELS</div>
+          <div className="col-span-4 text-right">RANK</div>
         </div>
 
         {leaderboard.map((entry) => (
@@ -75,10 +75,10 @@ export default function Leaderboard({ username }: Props) {
                 <span>{entry.user_id}</span>
               )}
             </div>
-            <div className="col-span-3 text-right">
+            <div className="col-span-2 text-right">
               {entry.total.toLocaleString()}
             </div>
-            <div className={`col-span-3 text-right ${entry.level.color}`}>
+            <div className={`col-span-4 text-right uppercase ${entry.level.color}`}>
               {entry.level.text}
             </div>
           </div>

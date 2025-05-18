@@ -7,20 +7,22 @@ import useIsMobile from "@/hooks/useIsMobile";
 import { useQueue } from "@/hooks/useQueue";
 import WaitingRoom from "./WaitingRoom";
 import { getCurrentGrid, getLastPixelPlaced } from "@/services/api";
+import useIsAdmin from "@/hooks/userIsAdmin";
+import { getCooldownRemaining } from "@/lib/utils";
 
 export default function Panel() {
-  const [selectedColor, setSelectedColor] = useState("#FFFFFF");
-  const [initialGrid, setInitialGrid] = useState<any[]>([]);
-  const [lastPixelPlaced, setLastPixelPlaced] = useState();
-  const [loadingData, setLoadingData] = useState(true);
-  const isMobile = useIsMobile();
   const you = useSyncExternalStore(
     $userStore.listen,
     $userStore.get,
     $userStore.get
   );
-  const { inQueue, position, queued, reason, isReady, connectionFailed } =
-    useQueue(you?.id!);
+  const [cooldown, setCooldown] = useState(0);
+  const [selectedColor, setSelectedColor] = useState("#FFFFFF");
+  const [initialGrid, setInitialGrid] = useState<any[]>([]);
+  const [loadingData, setLoadingData] = useState(true);
+  const isMobile = useIsMobile();
+  const { inQueue, position, queued, reason, isReady, connectionFailed } = useQueue(you?.id!);
+  const isAdmin = useIsAdmin();
 
   useEffect(() => {
     if (connectionFailed && !reason) {
@@ -35,13 +37,22 @@ export default function Panel() {
       setLoadingData(true);
       const grid = await getCurrentGrid();
       const pixel = await getLastPixelPlaced();
+      const lastPixelPlaced = pixel.length > 0 ? pixel[0] : null;
       setInitialGrid(grid);
-      setLastPixelPlaced(pixel.length > 0 ? pixel[0] : null);
+      setCooldown(isAdmin ? 0 : getCooldownRemaining(lastPixelPlaced?.created_at ?? null));
       setLoadingData(false);
     };
 
     fetchData();
   }, [you?.username, isReady, inQueue, reason]);
+
+  useEffect(() => {
+    if (cooldown <= 0) return;
+    const timer = setInterval(() => {
+      setCooldown((prev) => Math.max(prev - 1, 0));
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [cooldown]);
 
   if (!you || !you.username || !isReady) {
     return;
@@ -60,7 +71,7 @@ export default function Panel() {
           {/* Main Content */}
           {isMobile && (
             <div className="flex flex-col md:h-[calc(100vh-49px)] h-[60vh] p-2">
-              <RightPanel user={you} />
+              <RightPanel user={you} cooldown={cooldown} />
             </div>
           )}
 
@@ -69,14 +80,15 @@ export default function Panel() {
             <div className="flex-1 relative">
               <PixelCanvas
                 initialGrid={initialGrid}
-                lastPixelPlaced={lastPixelPlaced}
+                cooldown={cooldown}
+                setCooldown={setCooldown}
                 activeColor={selectedColor}
                 username={you?.username!}
               />
             </div>
 
             {/* Right Panel  */}
-            {!isMobile && <RightPanel user={you} />}
+            {!isMobile && <RightPanel user={you} cooldown={cooldown} />}
           </div>
 
           <Footer

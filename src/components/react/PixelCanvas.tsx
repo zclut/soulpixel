@@ -5,9 +5,7 @@ import type React from "react";
 import { useState, useEffect, useRef } from "react";
 import { Download, Shrink, ZoomIn, ZoomOut } from "lucide-react";
 
-import Cooldown from "./Cooldown";
 import { CANVAS_LIMITS, CELL_SIZE, COOLDOWN_DURATION } from "@/lib/const";
-import { getCooldownRemaining } from "@/lib/utils";
 import { grid, setInitialGrid, type PixelInfo } from "@/store";
 import { useStore } from "@nanostores/react";
 import useIsAdmin from "@/hooks/userIsAdmin";
@@ -15,13 +13,15 @@ import useIsAdmin from "@/hooks/userIsAdmin";
 interface PixelCanvasProps {
   activeColor: string;
   username: string;
-  lastPixelPlaced: any;
   initialGrid: any[];
+  cooldown: number;
+  setCooldown: React.Dispatch<React.SetStateAction<number>>;
 }
 
 export default function PixelCanvas({
   activeColor,
-  lastPixelPlaced,
+  cooldown,
+  setCooldown,
   username,
   initialGrid,
 }: PixelCanvasProps) {
@@ -46,10 +46,6 @@ export default function PixelCanvas({
   const touchStartPosition = useRef<{ x: number; y: number } | null>(null);
   const isAdmin = useIsAdmin();
   const defaultCooldown = isAdmin ? 0 : COOLDOWN_DURATION;
-
-  const [cooldown, setCooldown] = useState(
-    isAdmin ? 0 : getCooldownRemaining(lastPixelPlaced?.created_at ?? null)
-  );
 
   useEffect(() => {
     setIsTouchDevice("ontouchstart" in window || navigator.maxTouchPoints > 0);
@@ -580,13 +576,6 @@ export default function PixelCanvas({
           <Download size={16} />
         </button>
       </div>
-
-      {/* Espera para el proximo pixel */}
-      <Cooldown
-        cooldown={cooldown}
-        setCooldown={setCooldown}
-        cooldownDuration={defaultCooldown}
-      />
 
       {/* Información de navegación */}
       <div className="absolute top-2 left-2 text-xs bg-black/70 rounded-sm border border-purple-900/50 p-1">
