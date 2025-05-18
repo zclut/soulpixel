@@ -10,6 +10,7 @@ import { CANVAS_LIMITS, CELL_SIZE, COOLDOWN_DURATION } from "@/lib/const";
 import { getCooldownRemaining } from "@/lib/utils";
 import { grid, setInitialGrid, type PixelInfo } from "@/store";
 import { useStore } from "@nanostores/react";
+import useIsAdmin from "@/hooks/userIsAdmin";
 
 interface PixelCanvasProps {
   activeColor: string;
@@ -38,13 +39,17 @@ export default function PixelCanvas({
   const [lastPosition, setLastPosition] = useState({ x: 0, y: 0 });
   const [offset, setOffset] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(0.4);
-  const [cooldown, setCooldown] = useState(
-    getCooldownRemaining(lastPixelPlaced.created_at ?? null)
-  );
+
   const [isTouchDevice, setIsTouchDevice] = useState(false);
   const [touchMode, setTouchMode] = useState<"draw" | "move">("draw");
   const lastTouchTime = useRef<number>(0);
   const touchStartPosition = useRef<{ x: number; y: number } | null>(null);
+  const isAdmin = useIsAdmin();
+  const defaultCooldown = isAdmin ? 0 : COOLDOWN_DURATION;
+
+  const [cooldown, setCooldown] = useState(
+    isAdmin ? 0 : getCooldownRemaining(lastPixelPlaced?.created_at ?? null)
+  );
 
   useEffect(() => {
     setIsTouchDevice("ontouchstart" in window || navigator.maxTouchPoints > 0);
@@ -247,7 +252,7 @@ export default function PixelCanvas({
     if (isWithinLimits(x, y)) {
       const key = `${x},${y}`;
 
-      setCooldown(COOLDOWN_DURATION);
+      setCooldown(defaultCooldown);
 
       setPendingPixels((prev) => {
         const newPending = new Map(prev);
@@ -261,7 +266,7 @@ export default function PixelCanvas({
 
       try {
         await insertPixel(x, y, activeColor);
-        setCooldown(COOLDOWN_DURATION);
+        setCooldown(defaultCooldown);
       } catch (error) {
         console.error("Error al colocar el píxel:", error);
         setPendingPixels((prev) => {
@@ -580,7 +585,7 @@ export default function PixelCanvas({
       <Cooldown
         cooldown={cooldown}
         setCooldown={setCooldown}
-        cooldownDuration={COOLDOWN_DURATION}
+        cooldownDuration={defaultCooldown}
       />
 
       {/* Información de navegación */}

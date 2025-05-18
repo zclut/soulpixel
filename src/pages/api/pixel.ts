@@ -1,6 +1,6 @@
 import { getLastPixelPlaced, insertPixel } from "@/lib/supabase";
 import type { APIRoute } from "astro";
-import { COOLDOWN_DURATION } from '@/lib/const';
+import { COOLDOWN_DURATION } from "@/lib/const";
 
 type PixelData = {
   x: number;
@@ -17,10 +17,12 @@ export const POST: APIRoute = async ({ request, locals }) => {
     return new Response("Unauthorized", { status: 401 });
   }
   const username = user.username;
-
-  const response = await checkLastPixel(username)
-  if (response) {
-    return response;
+  const isAdmin = user.publicMetadata.admin ?? false;
+  if (!isAdmin) {
+    const response = await checkLastPixel(username);
+    if (response) {
+      return response;
+    }
   }
 
   const { data, error } = await insertPixel(x, y, color, username);
@@ -32,24 +34,23 @@ export const POST: APIRoute = async ({ request, locals }) => {
     });
   }
   const created_at = new Date();
-  const hora = new Intl.DateTimeFormat('en-GB', {
-    hour: '2-digit',
-    minute: '2-digit',
-    second: '2-digit',
+  const hora = new Intl.DateTimeFormat("en-GB", {
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
     hour12: false,
   }).format(created_at);
-    
+
   return new Response(
     JSON.stringify({
-      "user": username,
-      "x": x,
-      "y": y,
-      "color": color,
-      "created_at": hora,
+      user: username,
+      x: x,
+      y: y,
+      color: color,
+      created_at: hora,
     })
   );
 };
-
 
 const checkLastPixel = async (username: string) => {
   const { data, error } = await getLastPixelPlaced(username);
@@ -75,4 +76,4 @@ const checkLastPixel = async (username: string) => {
       );
     }
   }
-}
+};

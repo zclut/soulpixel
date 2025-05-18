@@ -36,7 +36,7 @@ export default function Panel() {
       const grid = await getCurrentGrid();
       const pixel = await getLastPixelPlaced();
       setInitialGrid(grid);
-      setLastPixelPlaced(pixel);
+      setLastPixelPlaced(pixel.length > 0 ? pixel[0] : null);
       setLoadingData(false);
     };
 
