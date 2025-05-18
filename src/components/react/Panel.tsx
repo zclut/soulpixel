@@ -6,7 +6,7 @@ import RightPanel from "@/components/react/RightPanel";
 import useIsMobile from "@/hooks/useIsMobile";
 import { useQueue } from "@/hooks/useQueue";
 import WaitingRoom from "./WaitingRoom";
-import { getCurrentGrid, getLastPixelPlaced } from '@/services/api';
+import { getCurrentGrid, getLastPixelPlaced } from "@/services/api";
 
 export default function Panel() {
   const [selectedColor, setSelectedColor] = useState("#FFFFFF");
@@ -19,7 +19,8 @@ export default function Panel() {
     $userStore.get,
     $userStore.get
   );
-  const { inQueue, position, queued, reason, isReady, connectionFailed } = useQueue(you?.id!);
+  const { inQueue, position, queued, reason, isReady, connectionFailed } =
+    useQueue(you?.id!);
 
   useEffect(() => {
     if (connectionFailed && !reason) {
@@ -41,7 +42,7 @@ export default function Panel() {
 
     fetchData();
   }, [you?.username, isReady, inQueue, reason]);
-  
+
   if (!you || !you.username || !isReady) {
     return;
   }
@@ -52,7 +53,7 @@ export default function Panel() {
 
   return (
     <>
-      {inQueue || reason  ? (
+      {inQueue || reason ? (
         <WaitingRoom queued={queued} position={position ?? 1} reason={reason} />
       ) : (
         <>

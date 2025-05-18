@@ -19,42 +19,44 @@ export default function Feed({ username }: Props) {
   // }, [$feedList]);
 
   return (
-    <ScrollArea className="h-full w-full" ref={scrollRef}>
-      <div className="p-2 space-y-1 font-mono text-xs">
-        {$feedList.length === 0 ? (
-          <div className="text-center">
-            <p className="text-yellow-500 font-semibold text-2xl font-mono mt-5 ">
-              The grid is silent... no echoes have reached this corner yet{" "}
-            </p>
+    <>
+      {$feedList.length === 0 ? (
+        <div className="h-full flex items-center text-center">
+          <p className="text-yellow-500 text-xl font-mono mt-5 ">
+            The grid is silent... no echoes have reached this corner yet{" "}
+          </p>
+        </div>
+      ) : (
+        <ScrollArea className="h-full w-full" ref={scrollRef}>
+          <div className="p-2 space-y-1 font-mono text-xs ">
+            {$feedList.map((feed) => (
+              <div
+                key={feed.uuid}
+                className="inline-block items-start gap-1 group animate-fadeIn w-full"
+              >
+                <span className="text-fuchsia-500">
+                  <span className="text-purple-700 ">
+                    {`[${feed.created_at}] `}{" "}
+                  </span>{" "}
+                  <span className="text-yellow-500 ">
+                    {`${feed.user}${username == feed.user ? " (you)" : ""}: `}
+                  </span>
+                  {feed.message}
+                  <span className="ml-1 text-yellow-500 ">
+                    ({feed.x} {feed.y})
+                  </span>
+                  <span
+                    className="ml-1 w-3 h-3 rounded-md mt-1"
+                    style={{ backgroundColor: feed.color }}
+                  >
+                    &nbsp;&nbsp;
+                  </span>
+                </span>
+              </div>
+            ))}
           </div>
-        ) : (
-          $feedList.map((feed) => (
-            <div
-              key={feed.uuid}
-              className="inline-block items-start gap-1 group animate-fadeIn w-full"
-            >
-              <span className="text-fuchsia-500">
-                <span className="text-purple-700 ">
-                  {`[${feed.created_at}] `}{" "}
-                </span>{" "}
-                <span className="text-yellow-500 ">
-                  {`${feed.user}${username == feed.user ? " (you)" : ""}: `}
-                </span>
-                {feed.message}
-                <span className="ml-1 text-yellow-500 ">
-                  ({feed.x} {feed.y})
-                </span>
-                <span
-                  className="ml-1 w-3 h-3 rounded-md mt-1"
-                  style={{ backgroundColor: feed.color }}
-                >
-                  &nbsp;&nbsp;
-                </span>
-              </span>
-            </div>
-          ))
-        )}
-      </div>
-    </ScrollArea>
+        </ScrollArea>
+      )}
+    </>
   );
 }

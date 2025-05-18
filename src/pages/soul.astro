@@ -6,7 +6,6 @@ import Panel from "@/components/react/Panel";
 
 const user = await Astro.locals.currentUser();
 
-
 if (!user || !user?.username) {
   return Astro.redirect("/");
 }
@@ -14,8 +13,6 @@ if (!user || !user?.username) {
 
 <Layout>
   <div class="bg-black text-purple-500 font-mono">
-    <Panel 
-      client:load 
-    />
+    <Panel client:load />
   </div>
 </Layout>
