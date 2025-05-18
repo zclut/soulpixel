@@ -26,8 +26,10 @@ export default function PixelCanvas({
 }: PixelCanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
-  const $grid = useStore(grid)
-  const [pendingPixels, setPendingPixels] = useState<Map<string, PixelInfo>>(new Map());
+  const $grid = useStore(grid);
+  const [pendingPixels, setPendingPixels] = useState<Map<string, PixelInfo>>(
+    new Map()
+  );
   const [hoveredCell, setHoveredCell] = useState<{
     x: number;
     y: number;
@@ -35,10 +37,18 @@ export default function PixelCanvas({
   const [isDragging, setIsDragging] = useState(false);
   const [lastPosition, setLastPosition] = useState({ x: 0, y: 0 });
   const [offset, setOffset] = useState({ x: 0, y: 0 });
-  const [zoom, setZoom] = useState(1);
+  const [zoom, setZoom] = useState(0.4);
   const [cooldown, setCooldown] = useState(
     getCooldownRemaining(lastPixelPlaced.created_at ?? null)
   );
+  const [isTouchDevice, setIsTouchDevice] = useState(false);
+  const [touchMode, setTouchMode] = useState<"draw" | "move">("draw");
+  const lastTouchTime = useRef<number>(0);
+  const touchStartPosition = useRef<{ x: number; y: number } | null>(null);
+
+  useEffect(() => {
+    setIsTouchDevice("ontouchstart" in window || navigator.maxTouchPoints > 0);
+  }, []);
 
   useEffect(() => {
     setInitialGrid(initialGrid);
@@ -61,7 +71,6 @@ export default function PixelCanvas({
     }, username);
   }, []);
 
-  // Función para dibujar el canvas
   const drawCanvas = () => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -72,16 +81,13 @@ export default function PixelCanvas({
     const width = canvas.width;
     const height = canvas.height;
 
-    // Limpiar canvas
     ctx.fillStyle = "#1a1a1a";
     ctx.fillRect(0, 0, width, height);
 
-    // Aplicar transformaciones
     ctx.save();
     ctx.translate(width / 2 + offset.x, height / 2 + offset.y);
     ctx.scale(zoom, zoom);
 
-    // Dibujar el borde del área permitida
     const borderWidth =
       (CANVAS_LIMITS.maxX - CANVAS_LIMITS.minX + 1) * CELL_SIZE;
     const borderHeight =
@@ -89,23 +95,20 @@ export default function PixelCanvas({
     const borderX = CANVAS_LIMITS.minX * CELL_SIZE;
     const borderY = CANVAS_LIMITS.minY * CELL_SIZE;
 
-    // Dibujar fondo del área permitida (ligeramente más claro)
     ctx.fillStyle = "#222222";
     ctx.fillRect(borderX, borderY, borderWidth, borderHeight);
 
-    // Dibujar borde del área permitida
     ctx.strokeStyle = "#444444";
     ctx.lineWidth = 2 / zoom;
     ctx.strokeRect(borderX, borderY, borderWidth, borderHeight);
 
-    // Optimización: Agrupar píxeles por color para reducir cambios de contexto
     const combinedGrid = new Map($grid);
     pendingPixels.forEach((color, key) => {
       combinedGrid.set(key, color);
     });
     const pixelsByColor = new Map<string, { x: number; y: number }[]>();
 
-    combinedGrid.forEach(({color}, key) => {
+    combinedGrid.forEach(({ color }, key) => {
       const [x, y] = key.split(",").map(Number);
 
       if (isWithinLimits(x, y)) {
@@ -116,32 +119,27 @@ export default function PixelCanvas({
       }
     });
 
-    // Dibujar píxeles agrupados por color
     pixelsByColor.forEach((pixels, color) => {
       ctx.fillStyle = color;
 
-      // Dibujar cada píxel sin espacios entre ellos
       pixels.forEach(({ x, y }) => {
-        // Usar un tamaño ligeramente mayor para evitar espacios entre píxeles
         ctx.fillRect(
           x * CELL_SIZE,
           y * CELL_SIZE,
-          CELL_SIZE + 0.5 / zoom, // Añadir una pequeña cantidad para evitar espacios
+          CELL_SIZE + 0.5 / zoom,
           CELL_SIZE + 0.5 / zoom
         );
       });
     });
 
-    // Dibujar retícula alrededor del cursor solo si está dentro de los límites
     if (
       hoveredCell &&
       isWithinLimits(hoveredCell.x, hoveredCell.y) &&
-      cooldown <= 0
+      cooldown <= 0 &&
+      (!isTouchDevice || touchMode === "draw")
     ) {
-      // Dibujar solo una pequeña área alrededor del cursor (5x5 celdas)
       const gridRadius = 5;
 
-      // Primero dibujar la retícula
       ctx.strokeStyle = "#333333";
       ctx.lineWidth = 0.5 / zoom;
 
@@ -150,14 +148,12 @@ export default function PixelCanvas({
           const x = hoveredCell.x + i;
           const y = hoveredCell.y + j;
 
-          // Solo dibujar retícula dentro de los límites
           if (isWithinLimits(x, y)) {
             ctx.strokeRect(x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE, CELL_SIZE);
           }
         }
       }
 
-      // Luego dibujar el borde de la celda seleccionada
       ctx.strokeStyle = "#b280ff";
       ctx.lineWidth = 2 / zoom;
       ctx.strokeRect(
@@ -171,7 +167,6 @@ export default function PixelCanvas({
     ctx.restore();
   };
 
-  // Verificar si una coordenada está dentro de los límites
   const isWithinLimits = (x: number, y: number): boolean => {
     return (
       x >= CANVAS_LIMITS.minX &&
@@ -181,19 +176,16 @@ export default function PixelCanvas({
     );
   };
 
-  // Dibujar el canvas cuando cambian las dependencias
   useEffect(() => {
     drawCanvas();
-  }, [$grid, pendingPixels, hoveredCell, offset, zoom]);
+  }, [$grid, pendingPixels, hoveredCell, offset, zoom, touchMode]);
 
-  // Manejar resize del canvas
   useEffect(() => {
     const handleResize = () => {
       const canvas = canvasRef.current;
       const container = containerRef.current;
       if (!canvas || !container) return;
 
-      // Establecer el tamaño del canvas al tamaño del contenedor
       canvas.width = container.clientWidth;
       canvas.height = container.clientHeight;
 
@@ -206,7 +198,6 @@ export default function PixelCanvas({
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  // Manejar zoom de afuera
   useEffect(() => {
     const preventScroll = (e: Event) => {
       e.preventDefault();
@@ -229,18 +220,15 @@ export default function PixelCanvas({
     };
   }, []);
 
-  // Convertir coordenadas del mouse a coordenadas del grid
-  const mouseToGrid = (e: React.MouseEvent<HTMLCanvasElement>) => {
+  const clientToGrid = (clientX: number, clientY: number) => {
     const canvas = canvasRef.current;
     if (!canvas) return null;
 
     const rect = canvas.getBoundingClientRect();
 
-    // Obtener la posición exacta del mouse relativa al canvas
-    const mouseX = e.clientX - rect.left;
-    const mouseY = e.clientY - rect.top;
+    const mouseX = clientX - rect.left;
+    const mouseY = clientY - rect.top;
 
-    // Aplicar transformaciones inversas para obtener la posición en el grid
     const gridX = Math.floor(
       ((mouseX - canvas.width / 2) / zoom - offset.x / zoom) / CELL_SIZE
     );
@@ -287,12 +275,13 @@ export default function PixelCanvas({
   };
 
   const handleCanvasMouseMove = (e: React.MouseEvent<HTMLCanvasElement>) => {
-    const gridPos = mouseToGrid(e);
+    if (isTouchDevice) return;
+
+    const gridPos = clientToGrid(e.clientX, e.clientY);
     if (!gridPos) return;
 
     setHoveredCell(gridPos);
 
-    // Manejar arrastre
     if (isDragging) {
       const dx = e.clientX - lastPosition.x;
       const dy = e.clientY - lastPosition.y;
@@ -310,15 +299,14 @@ export default function PixelCanvas({
   };
 
   const handleCanvasMouseDown = (e: React.MouseEvent<HTMLCanvasElement>) => {
-    // Botón izquierdo: colocar píxel
+    if (isTouchDevice) return;
+
     if (e.button === 0) {
-      const gridPos = mouseToGrid(e);
+      const gridPos = clientToGrid(e.clientX, e.clientY);
       if (gridPos) {
         placePixel(gridPos.x, gridPos.y);
       }
-    }
-    // Botón derecho o central: iniciar arrastre
-    else if (e.button === 2 || e.button === 1) {
+    } else if (e.button === 2 || e.button === 1) {
       e.preventDefault();
       setIsDragging(true);
       setLastPosition({
@@ -328,11 +316,13 @@ export default function PixelCanvas({
     }
   };
 
-  const handleCanvasMouseUp = () => {
+  const handleCanvasMouseUp = (e: React.MouseEvent<HTMLCanvasElement>) => {
+    if (isTouchDevice) return;
     setIsDragging(false);
   };
 
-  const handleCanvasMouseLeave = () => {
+  const handleCanvasMouseLeave = (e: React.MouseEvent<HTMLCanvasElement>) => {
+    if (isTouchDevice) return;
     setHoveredCell(null);
     setIsDragging(false);
   };
@@ -340,11 +330,9 @@ export default function PixelCanvas({
   const handleWheel = (e: React.WheelEvent<HTMLCanvasElement>) => {
     e.preventDefault();
 
-    // Calcular nuevo zoom
     const delta = -e.deltaY * 0.001;
     const newZoom = Math.max(0.1, Math.min(10, zoom + delta * zoom));
 
-    // Ajustar offset para hacer zoom hacia el cursor
     const rect = canvasRef.current?.getBoundingClientRect();
     if (!rect) return;
 
@@ -362,13 +350,114 @@ export default function PixelCanvas({
     setZoom(newZoom);
   };
 
-  // Prevenir menú contextual
+  const handleTouchStart = (e: React.TouchEvent<HTMLCanvasElement>) => {
+    e.preventDefault();
+
+    if (e.touches.length === 0) return;
+
+    const touch = e.touches[0];
+    const now = Date.now();
+
+    touchStartPosition.current = { x: touch.clientX, y: touch.clientY };
+
+    if (now - lastTouchTime.current < 300) {
+      setTouchMode((prev) => (prev === "draw" ? "move" : "draw"));
+      touchStartPosition.current = null;
+      lastTouchTime.current = 0;
+      return;
+    }
+
+    lastTouchTime.current = now;
+
+    if (touchMode === "move") {
+      setIsDragging(true);
+      setLastPosition({
+        x: touch.clientX,
+        y: touch.clientY,
+      });
+      return;
+    }
+
+    const gridPos = clientToGrid(touch.clientX, touch.clientY);
+    if (gridPos) {
+      setHoveredCell(gridPos);
+    }
+  };
+
+  const handleTouchMove = (e: React.TouchEvent<HTMLCanvasElement>) => {
+    e.preventDefault();
+
+    if (e.touches.length === 0) return;
+
+    const touch = e.touches[0];
+
+    if (touchMode === "move") {
+      if (isDragging) {
+        const dx = touch.clientX - lastPosition.x;
+        const dy = touch.clientY - lastPosition.y;
+
+        setOffset((prev) => ({
+          x: prev.x + dx,
+          y: prev.y + dy,
+        }));
+
+        setLastPosition({
+          x: touch.clientX,
+          y: touch.clientY,
+        });
+      }
+      return;
+    }
+
+    const gridPos = clientToGrid(touch.clientX, touch.clientY);
+    if (gridPos) {
+      setHoveredCell(gridPos);
+    }
+
+    if (touchStartPosition.current) {
+      const dx = touch.clientX - touchStartPosition.current.x;
+      const dy = touch.clientY - touchStartPosition.current.y;
+      const distance = Math.sqrt(dx * dx + dy * dy);
+
+      if (distance > 10) {
+        touchStartPosition.current = null;
+      }
+    }
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent<HTMLCanvasElement>) => {
+    e.preventDefault();
+
+    if (touchMode === "move" && isDragging) {
+      setIsDragging(false);
+      return;
+    }
+
+    const now = Date.now();
+
+    if (
+      touchMode === "draw" &&
+      touchStartPosition.current &&
+      hoveredCell &&
+      now - lastTouchTime.current > 300
+    ) {
+      placePixel(hoveredCell.x, hoveredCell.y);
+    }
+
+    touchStartPosition.current = null;
+  };
+
+  const handleTouchCancel = (e: React.TouchEvent<HTMLCanvasElement>) => {
+    e.preventDefault();
+    setIsDragging(false);
+    touchStartPosition.current = null;
+  };
+
   const handleContextMenu = (e: React.MouseEvent) => {
     e.preventDefault();
     return false;
   };
 
-  // Centrar el canvas en el área permitida
   const centerCanvas = () => {
     setOffset({ x: 0, y: 0 });
     setZoom(1);
@@ -389,17 +478,15 @@ export default function PixelCanvas({
     tempCanvas.width = width;
     tempCanvas.height = height;
 
-    // Dibujar fondo
     tempCtx.fillStyle = "#1a1a1a";
     tempCtx.fillRect(0, 0, width, height);
 
-    // Dibujar píxeles
     const combinedGrid = new Map($grid);
     pendingPixels.forEach((color, key) => {
       combinedGrid.set(key, color);
     });
 
-    combinedGrid.forEach(({color}, key) => {
+    combinedGrid.forEach(({ color }, key) => {
       const [x, y] = key.split(",").map(Number);
       if (x >= minX && x <= maxX && y >= minY && y <= maxY) {
         const drawX = (x - minX) * CELL_SIZE;
@@ -418,100 +505,10 @@ export default function PixelCanvas({
     tempCtx.textBaseline = "bottom";
     tempCtx.fillText("SOUL PIXEL", width - padding, height - padding);
 
-    // Descargar imagen
     const link = document.createElement("a");
     link.download = "pixel_canvas_area.png";
     link.href = tempCanvas.toDataURL("image/png");
     link.click();
-  };
-
-  // Mobile
-  const getEventPos = (
-    e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>
-  ) => {
-    if ("touches" in e && e.touches.length > 0) {
-      return {
-        clientX: e.touches[0].clientX,
-        clientY: e.touches[0].clientY,
-      };
-    } else if ("clientX" in e) {
-      return {
-        clientX: e.clientX,
-        clientY: e.clientY,
-      };
-    }
-    return null;
-  };
-
-  const handleCanvasPointerMove = (
-    e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>
-  ) => {
-    e.preventDefault();
-    const pos = getEventPos(e);
-    if (!pos) return;
-
-    const gridPos = mouseToGrid({
-      clientX: pos.clientX,
-      clientY: pos.clientY,
-    } as React.MouseEvent<HTMLCanvasElement>);
-    if (!gridPos) return;
-
-    setHoveredCell(gridPos);
-
-    if (isDragging) {
-      const dx = pos.clientX - lastPosition.x;
-      const dy = pos.clientY - lastPosition.y;
-
-      setOffset((prev) => ({
-        x: prev.x + dx,
-        y: prev.y + dy,
-      }));
-
-      setLastPosition({
-        x: pos.clientX,
-        y: pos.clientY,
-      });
-    }
-  };
-
-  const handleCanvasPointerDown = (
-    e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>
-  ) => {
-    e.preventDefault();
-    const pos = getEventPos(e);
-    if (!pos) return;
-
-    const gridPos = mouseToGrid({
-      clientX: pos.clientX,
-      clientY: pos.clientY,
-    } as React.MouseEvent<HTMLCanvasElement>);
-    if (!gridPos) return;
-
-    // Para touch solo colocamos pixel (sin botones secundarios)
-    if ("touches" in e) {
-      placePixel(gridPos.x, gridPos.y);
-    } else if ("button" in e) {
-      if (e.button === 0) {
-        placePixel(gridPos.x, gridPos.y);
-      } else if (e.button === 2 || e.button === 1) {
-        setIsDragging(true);
-        setLastPosition({ x: pos.clientX, y: pos.clientY });
-      }
-    }
-  };
-
-  const handleCanvasPointerUp = (
-    e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>
-  ) => {
-    e.preventDefault();
-    setIsDragging(false);
-  };
-
-  const handleCanvasPointerCancel = (
-    e: React.TouchEvent<HTMLCanvasElement>
-  ) => {
-    e.preventDefault();
-    setIsDragging(false);
   };
 
   return (
@@ -528,10 +525,10 @@ export default function PixelCanvas({
         onMouseLeave={handleCanvasMouseLeave}
         onWheel={handleWheel}
         onContextMenu={handleContextMenu}
-        onTouchStart={handleCanvasPointerDown}
-        onTouchMove={handleCanvasPointerMove}
-        onTouchEnd={handleCanvasPointerUp}
-        onTouchCancel={handleCanvasPointerCancel}
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+        onTouchCancel={handleTouchCancel}
         className={`w-full h-full ${
           isDragging
             ? "cursor-grabbing"
@@ -587,8 +584,17 @@ export default function PixelCanvas({
       />
 
       {/* Información de navegación */}
-      <div className="absolute top-2 left-2 text-xs bg-black/70 rounded-sm border border-purple-900/50 p-1 ">
-        <div className="mt-1">Left: Draw | Right: Move | Scroll: Zoom</div>
+      <div className="absolute top-2 left-2 text-xs bg-black/70 rounded-sm border border-purple-900/50 p-1">
+        <div className="mt-1">
+          {isTouchDevice ? (
+            <>
+              Mode: {touchMode === "draw" ? "Draw" : "Move"} (Doble touch for
+              change)
+            </>
+          ) : (
+            <>Left: Draw | Right: Move | Scroll: Zoom</>
+          )}
+        </div>
         <div className="flex justify-between">
           <div>Zoom: {zoom.toFixed(1)}x</div>
           {hoveredCell && (
