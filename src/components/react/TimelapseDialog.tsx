@@ -21,13 +21,13 @@ export default function TimelapseDialog() {
           className="bg-purple-700/40 text-white hover:bg-purple-900 border border-purple-900/50 rounded-sm text-xs h-8 w-full flex items-center justify-center gap-2 cursor-pointer"
           onClick={() => setOpen(true)}
         >
-          Ver Timelapse
+          Unfold the Soul’s Mind
         </Button>
       </DialogTrigger>
 
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Timelapse of the Soul</DialogTitle>
+          <DialogTitle>The Soul Remembers</DialogTitle>
         </DialogHeader>
 
         <motion.div
