@@ -46,7 +46,7 @@ export default function Leaderboard({ username }: Props) {
 
   return (
     <ScrollArea className="h-full w-full">
-      <div className="p-2 space-y-1 font-mono text-xs">
+      <div className="px-2 py-1 space-y-1 font-mono text-xs">
         <div className="grid grid-cols-12 gap-2 text-purple-700 border-b border-purple-900/50 pb-1 mb-2">
           <div className="col-span-1">#</div>
           <div className="col-span-5">USER</div>

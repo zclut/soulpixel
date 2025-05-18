@@ -22,13 +22,13 @@ export default function Feed({ username }: Props) {
     <>
       {$feedList.length === 0 ? (
         <div className="h-full flex items-center text-center">
-          <p className="text-yellow-500 text-xl font-mono mt-5 ">
+          <p className="text-yellow-500 text-xl font-mono">
             The grid is silent... no echoes have reached this corner yet{" "}
           </p>
         </div>
       ) : (
         <ScrollArea className="h-full w-full" ref={scrollRef}>
-          <div className="p-2 space-y-1 font-mono text-xs ">
+          <div className="px-2 py-1 space-y-1 font-mono text-xs ">
             {$feedList.map((feed) => (
               <div
                 key={feed.uuid}

@@ -44,7 +44,7 @@ const RightPanel = ({ user }: Props) => {
             </TabsTrigger>
           </TabsList>
 
-          <div className="flex-1 overflow-hidden">
+          <div className="flex-2 overflow-hidden mb-10">
             <TabsContent value="feed" className="h-full">
               <Feed username={user.username} />
             </TabsContent>

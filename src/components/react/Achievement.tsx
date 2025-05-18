@@ -1,46 +1,3 @@
-/**
-interface Props {
-  username: string;
-}
-
-export default function Achievement({ username }: Props) {
-  const $userPixelCounts = useStore(userPixelCounts);
-  const userCount = $userPixelCounts.get(username) || 0;
-
-  const userAchievements = getAchievementsUpToPixels(userCount);
-
-  return (
-    <div
-      className="achievement-list p-4 text-white rounded-md space-y-4 max-h-96 overflow-y-auto"
-      style={{ maxHeight: "24rem" }} // max height ~384px
-    >
-      {userAchievements.length > 0 ? (
-        userAchievements.map((achv) => (
-          <div
-            key={achv.rank}
-            className="achievement-item border border-purple-600 p-3 rounded-md"
-          >
-            <h3 className="text-lg font-semibold">
-              {achv.emoji} {achv.rank}
-            </h3>
-            <p>{achv.description}</p>
-            <p className="mt-1 text-sm text-gray-400">
-              From {achv.minPixels}
-              {achv.maxPixels ? ` to ${achv.maxPixels}` : "+"} souls
-            </p>
-          </div>
-        ))
-      ) : (
-        <p>Place some pixels to start your journey...</p>
-      )}
-    </div>
-  );
-}
-
-*/
-
-("use client");
-
 import { useStore } from "@nanostores/react";
 import { userStats } from "@/store";
 import { getAchievementsUpToPixels } from "@/utils/achievements.utils";
@@ -64,34 +21,80 @@ export default function Achievements({ username }: Props) {
     rank
   );
 
-  const getRarityColor = (rarity: string) => {
-    switch (rarity) {
-      case "common":
-        return "bg-purple-900/20 text-purple-500 border-purple-900/50";
-      case "uncommon":
-        return "bg-blue-900/20 text-blue-500 border-blue-900/50";
-      case "rare":
-        return "bg-fuchsia-900/20 text-fuchsia-500 border-fuchsia-900/50";
-      case "epic":
-        return "bg-pink-900/20 text-pink-500 border-pink-900/50";
-      case "legendary":
-        return "bg-yellow-900/20 text-yellow-500 border-yellow-900/50";
-      default:
-        return "bg-purple-900/20 text-purple-500 border-purple-900/50";
-    }
+  const getRarityColor = (
+    rarity: string,
+    options: {
+      background?: boolean;
+      text?: boolean;
+      border?: boolean;
+      progress?: boolean;
+    } = { background: true, text: true, border: true }
+  ) => {
+    const {
+      background = true,
+      text = true,
+      border = true,
+      progress = false,
+    } = options;
+
+    const styles: Record<
+      string,
+      { bg: string; text: string; border: string; progress: string }
+    > = {
+      common: {
+        bg: "bg-purple-900/20",
+        text: "text-purple-500",
+        border: "border-purple-900/50",
+        progress: "bg-purple-800",
+      },
+      uncommon: {
+        bg: "bg-blue-900/20",
+        text: "text-blue-500",
+        border: "border-blue-900/50",
+        progress: "bg-blue-800",
+      },
+      rare: {
+        bg: "bg-fuchsia-900/20",
+        text: "text-fuchsia-500",
+        border: "border-fuchsia-900/50",
+        progress: "bg-fuchsia-800",
+      },
+      epic: {
+        bg: "bg-pink-900/20",
+        text: "text-pink-500",
+        border: "border-pink-900/50",
+        progress: "bg-pink-800",
+      },
+      legendary: {
+        bg: "bg-yellow-900/20",
+        text: "text-yellow-500",
+        border: "border-yellow-900/50",
+        progress: "bg-yellow-800",
+      },
+    };
+
+    const fallback = styles["common"];
+    const style = styles[rarity] || fallback;
+
+    return [
+      background ? style.bg : "",
+      text ? style.text : "",
+      border ? style.border : "",
+      progress ? style.progress : "",
+    ]
+      .filter(Boolean)
+      .join(" ");
   };
 
   return (
     <ScrollArea className="h-full w-full">
-      <div className="p-2 space-y-3 font-mono text-xs">
+      <div className="px-2 py-1 space-y-3 font-mono text-xs">
         {userAchievements.map((achievement) => (
           <div
             key={achievement.id}
-            className={`border rounded-sm p-2 ${
-              achievement.unlocked
-                ? getRarityColor(achievement.rarity)
-                : "border-purple-900/30 bg-black/50 text-purple-700"
-            }`}
+            className={`border rounded-sm font-semibold font-mono p-2 ${getRarityColor(
+              achievement.rarity
+            )}`}
           >
             <div className="flex items-center gap-2 mb-1">
               <div
@@ -105,18 +108,14 @@ export default function Achievements({ username }: Props) {
               </div>
               <div className="flex-1">
                 <div className="flex items-center gap-2">
-                  <span
-                    className={achievement.unlocked ? "" : "text-purple-700"}
-                  >
-                    {achievement.name}
-                  </span>
+                  <span> {achievement.name} </span>
                   {achievement.unlocked ? (
-                    <Unlock className="h-3 w-3 text-purple-500" />
+                    <Unlock className="h-3 w-3" />
                   ) : (
                     <Lock className="h-3 w-3" />
                   )}
                 </div>
-                <div className="text-[10px] text-purple-700 mt-0.5">
+                <div className="text-[10px] opacity-80 font-light mt-0.5">
                   {achievement.description}
                 </div>
               </div>
@@ -136,18 +135,13 @@ export default function Achievements({ username }: Props) {
               </div>
               <Progress
                 value={(achievement.progress / achievement.maxProgress) * 100}
-                className={`h-1 ${
-                  achievement.unlocked ? "bg-black/50" : "bg-purple-900/20"
-                }`}
-                indicatorClassName={
-                  achievement.unlocked
-                    ? `${
-                        achievement.rarity === "legendary"
-                          ? "bg-gradient-to-r from-yellow-500 to-red-500"
-                          : ""
-                      }`
-                    : "bg-purple-700"
-                }
+                className={`h-1 ${getRarityColor(achievement.rarity)}`}
+                indicatorClassName={`${getRarityColor(achievement.rarity, {
+                  progress: true,
+                  border: false,
+                  text: false,
+                  background: false,
+                })}`}
               />
             </div>
           </div>
