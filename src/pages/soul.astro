@@ -1,8 +1,8 @@
 ---
 import "../styles/global.css";
-// Component Imports
 import Layout from "@/layouts/Layout.astro";
 import Panel from "@/components/react/Panel";
+import { Toaster } from "@/components/ui/sonner"
 
 const user = await Astro.locals.currentUser();
 
@@ -13,6 +13,7 @@ if (!user || !user?.username) {
 
 <Layout>
   <div class="bg-black text-purple-500 font-mono">
+    <Toaster client:load />
     <Panel client:load />
   </div>
 </Layout>

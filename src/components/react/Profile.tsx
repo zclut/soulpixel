@@ -5,6 +5,7 @@ import { userPixelCounts, userStats } from "@/store";
 import { useStore } from "@nanostores/react";
 import { getFormattedTime, getLevelFromPixels } from "@/lib/utils";
 import { getAchievementsUpToPixels } from "@/utils/achievements.utils";
+import useIsLevelUp from "@/hooks/useLevelUp";
 
 interface Props {
   username: string;
@@ -17,6 +18,7 @@ const Profile = ({ username, cooldown }: Props) => {
   const userCount = $userPixelCounts.get(username) || 0;
   const level = getLevelFromPixels(userCount);
   const { totalSouls, uniqueColors, rank } = useStore($userStats);
+  useIsLevelUp();
 
   const userAchievements = getAchievementsUpToPixels(
     totalSouls,
