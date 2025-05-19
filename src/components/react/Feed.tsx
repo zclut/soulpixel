@@ -19,14 +19,14 @@ export default function Feed({ username }: Props) {
     if ($feedList.length > 50) {
       $feedList.pop();
     }
-  }, [$feedList])
+  }, [$feedList]);
 
   return (
     <>
       {$feedList.length === 0 ? (
         <div className="h-full flex items-center text-center">
           <p className="text-yellow-500 text-xl font-mono">
-            The grid is silent... no echoes have reached this corner yet{" "}
+            The soul is silent... no fragments have reached this corner yet{" "}
           </p>
         </div>
       ) : (

@@ -1,11 +1,11 @@
 import { feedList, type Pixel } from "@/store";
 
 const othersPlaceMessages = [
-  "Left a spectral trace at",
-  "Seeded a signal in the grid at",
+  "Left a fragment trace at",
+  "Seeded a fragment in the Soul at",
   "A presence known as has touched at",
   "Etched a pulse at",
-  "A soul has left a mark at",
+  "An entity has left a mark at",
 ];
 
 export function addFeedStore(pixel: Pixel) {

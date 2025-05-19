@@ -11,7 +11,7 @@ const Creators = () => {
           transition={{ duration: 1 }}
           viewport={{ once: true }}
         >
-          Creators of the Souls
+          Creators of the Soul
         </motion.h2>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -25,7 +25,7 @@ const Creators = () => {
               name: "Klasinky",
               github: "https://github.com/klasinky",
               image: "https://avatars.githubusercontent.com/u/58831952?v=4",
-            }
+            },
           ].map((creator, index) => (
             <motion.div
               key={index}

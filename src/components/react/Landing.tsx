@@ -1,16 +1,13 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
-import {
-  SignInButton,
-  SignedIn,
-  SignedOut,
-} from "@clerk/astro/react";
+import { SignInButton, SignedIn, SignedOut } from "@clerk/astro/react";
 
 export default function LandingPage() {
   const [isTyping, setIsTyping] = useState(true);
   const [typedText, setTypedText] = useState("");
-  const fullText = "You don't just place a pixel. You leave a trace of who you are.\nAnd something... listens.";
+  const fullText =
+    "You don't just place a fragment. You leave a trace of who you are.\nAnd something... listens.";
 
   useEffect(() => {
     if (isTyping) {
@@ -76,13 +73,13 @@ export default function LandingPage() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 5, duration: 0.8 }}
+          transition={{ delay: 4, duration: 0.8 }}
           className="relative"
         >
           <div className="absolute -inset-1 bg-gradient-to-r from-purple-600/30 to-violet-800/30 rounded-lg blur-lg group-hover:opacity-100 transition duration-1000 group-hover:duration-200 animate-pulse"></div>
           <SignedOut>
             <SignInButton mode="modal">
-              <Button className="cursor-pointer relative group font-mono text-lg px-8 py-6 bg-transparent border border-purple-900/50 hover:border-purple-500/50 text-gray-300 hover:text-[#c4a9ff] transition-all duration-300 overflow-hidden">
+              <Button className="cursor-pointer relative group font-mono text-lg px-8 py-6 bg-transparent  border-purple-900/50 hover:border-purple-500/50 text-gray-300 hover:text-[#c4a9ff] transition-all duration-300 overflow-hidden">
                 <span className="relative z-10">Enter the Soul</span>
                 <span className="absolute inset-0 bg-gradient-to-r from-[#1e1e1e] to-[#2a0a3e] opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
                 <span className="absolute inset-0 bg-[#1a0a2e] opacity-0 group-hover:opacity-30 glitch-effect"></span>
@@ -92,7 +89,7 @@ export default function LandingPage() {
 
           <SignedIn>
             <a href="/soul">
-              <Button className="cursor-pointer relative group font-mono text-lg px-8 py-6 bg-transparent border border-purple-900/50 hover:border-purple-500/50 text-gray-300 hover:text-[#c4a9ff] transition-all duration-300 overflow-hidden">
+              <Button className="cursor-pointer relative group font-mono text-lg px-8 py-6 bg-transparent  border-purple-900/50 hover:border-purple-500/50 text-gray-300 hover:text-[#c4a9ff] transition-all duration-300 overflow-hidden">
                 <span className="relative z-10">Feed the Soul</span>
                 <span className="absolute inset-0 bg-gradient-to-r from-[#1e1e1e] to-[#2a0a3e] opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
                 <span className="absolute inset-0 bg-[#1a0a2e] opacity-0 group-hover:opacity-30 glitch-effect"></span>

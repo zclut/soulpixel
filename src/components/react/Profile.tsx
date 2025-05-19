@@ -30,19 +30,18 @@ const Profile = ({ username, cooldown }: Props) => {
   ).filter((achievement) => achievement.unlocked).length;
 
   const profile = [
-    { id: 1, name: "TAG", value: username },
+    { id: 1, name: "ENTITY", value: username },
     { id: 2, name: "RANK", value: level?.text.toUpperCase() },
-    { id: 3, name: "SOULS", value: userCount },
+    { id: 3, name: "FRAGMENTS", value: userCount },
     { id: 4, name: "ACHIEVEMENTS", value: userAchievements },
   ];
 
   const PROFILE_STYLES = {
-    TAG: { color: "text-fuchsia-500" },
+    ENTITY: { color: "text-fuchsia-500" },
     RANK: { color: level?.color },
-    SOULS: { color: "text-fuchsia-500" },
+    FRAGMENTS: { color: "text-fuchsia-500" },
     ACHIEVEMENTS: { color: "text-yellow-500" },
-    COOLDOWN: { color: "text-fuchsia-500" },
-  }
+  };
 
   return (
     <div className="border border-purple-900/50 bg-black/80 rounded-sm overflow-hidden">
@@ -52,7 +51,7 @@ const Profile = ({ username, cooldown }: Props) => {
           PROFILE
         </div>
         <div>
-          <TimelapseDialog/>
+          <TimelapseDialog />
         </div>
       </div>
       <div className="p-2">
@@ -77,9 +76,18 @@ const Profile = ({ username, cooldown }: Props) => {
           </div>
           <div className="flex flex-wrap justify-between text-sm w-full">
             {profile.map(({ id, name, value }) => (
-              <div key={id} className={`flex w-1/2 items-center gap-1 align-middle`}>
+              <div
+                key={id}
+                className={`flex w-1/2 items-center gap-1 align-middle`}
+              >
                 <span className="text-purple-500 font-semibold">{name}:</span>
-                <span className={`${PROFILE_STYLES[name as keyof typeof PROFILE_STYLES].color} truncate font-mono text-xs`}>{value}</span>
+                <span
+                  className={`${
+                    PROFILE_STYLES[name as keyof typeof PROFILE_STYLES].color
+                  } truncate font-mono text-xs`}
+                >
+                  {value}
+                </span>
               </div>
             ))}
           </div>

@@ -15,7 +15,7 @@ export const LEVEL = {
     ECHO: { text: "ECHO", color: "text-purple-500", pixels: 0 },
     AWAKENING: { text: "AWAKENING", color: "text-blue-500", pixels: 10 },
     SPIRIT: { text: "SPIRIT", color: "text-fuchsia-500", pixels: 500 },
-    ASCENDED: { text: "ASCENDED", color: "text-pink-500", pixels: 1000 },
+    FRAGMENTER: { text: "FRAGMENTER", color: "text-pink-500", pixels: 1000 },
     ETERNAL: { text: "ETERNAL", color: "text-yellow-500", pixels: 5000 },
 }
 

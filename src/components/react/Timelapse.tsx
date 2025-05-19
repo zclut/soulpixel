@@ -21,17 +21,17 @@ const Timelapse = () => {
           transition={{ duration: 1, delay: 0.3 }}
           viewport={{ once: true }}
         >
-            <div className="absolute inset-0 w-full h-full rounded-[0.5rem] overflow-hidden">
-                <video
-                className="w-full h-full object-fill"
-                src="https://soulpixel.klasinky.com/timelapse/timelapse.mp4"
-                autoPlay
-                loop
-                muted
-                playsInline
-                controls={false}
-                />
-            </div>
+          <div className="absolute inset-0 w-full h-full rounded-[0.5rem] overflow-hidden">
+            <video
+              className="w-full h-full object-fill"
+              src="https://soulpixel.klasinky.com/timelapse/timelapse.mp4"
+              autoPlay
+              loop
+              muted
+              playsInline
+              controls={false}
+            />
+          </div>
         </motion.div>
 
         <motion.p
@@ -41,8 +41,8 @@ const Timelapse = () => {
           transition={{ duration: 1, delay: 0.6 }}
           viewport={{ once: true }}
         >
-          Watch as countless souls leave their mark, creating something greater
-          than themselves.
+          Watch as countless entities leave their fragments, creating something
+          greater than themselves.
         </motion.p>
       </div>
     </section>

@@ -24,24 +24,24 @@ export default function Leaderboard({ username }: Props) {
 
   useEffect(() => {
     const rankedUsers = Array.from($userPixelCounts.entries())
-    .sort(([_, a], [__, b]) => b - a)
-    .map(([key, value], index) => ({
-      id: index,
-      level: getLevelFromPixels(value),
-      rank: index + 1,
-      total: value,
-      user_id: key,
-      isYou: key === username,
-    }));
+      .sort(([_, a], [__, b]) => b - a)
+      .map(([key, value], index) => ({
+        id: index,
+        level: getLevelFromPixels(value),
+        rank: index + 1,
+        total: value,
+        user_id: key,
+        isYou: key === username,
+      }));
 
     setLeaderboard(rankedUsers);
   }, [$userPixelCounts]);
 
-  const getRankIcon = (rank: number) => {
+  const getRankIcon = (rank: number, color: string = "") => {
     if (rank === 1) return <Trophy className="h-4 w-4 text-yellow-400" />;
     if (rank === 2) return <Trophy className="h-4 w-4 text-gray-400" />;
     if (rank === 3) return <Trophy className="h-4 w-4 text-amber-700" />;
-    return <span className="text-green-700">#{rank}</span>;
+    return <span className={`${color}`}>#{rank}</span>;
   };
 
   return (
@@ -49,8 +49,8 @@ export default function Leaderboard({ username }: Props) {
       <div className="px-2 py-1 space-y-1 font-mono text-xs">
         <div className="grid grid-cols-12 gap-2 text-purple-700 border-b border-purple-900/50 pb-1 mb-2">
           <div className="col-span-1">#</div>
-          <div className="col-span-5">USER</div>
-          <div className="col-span-2 text-right">PIXELS</div>
+          <div className="col-span-5">ENTITY</div>
+          <div className="col-span-2 text-right">FRAGMENTS</div>
           <div className="col-span-4 text-right">RANK</div>
         </div>
 
@@ -64,7 +64,7 @@ export default function Leaderboard({ username }: Props) {
             }`}
           >
             <div className="col-span-1 flex items-center">
-              {getRankIcon(entry.rank)}
+              {getRankIcon(entry.rank, entry.level.color)}
             </div>
             <div className="col-span-5 flex items-center truncate">
               {entry.isYou ? (
@@ -72,13 +72,15 @@ export default function Leaderboard({ username }: Props) {
                   {entry.user_id} <span className="text-purple-700">(you)</span>
                 </span>
               ) : (
-                <span>{entry.user_id}</span>
+                <span className={`${entry.level.color}`}>{entry.user_id}</span>
               )}
             </div>
-            <div className="col-span-2 text-right">
+            <div className={`col-span-2 text-right ${entry.level.color}`}>
               {entry.total.toLocaleString()}
             </div>
-            <div className={`col-span-4 text-right uppercase ${entry.level.color}`}>
+            <div
+              className={`col-span-4 text-right uppercase ${entry.level.color}`}
+            >
               {entry.level.text}
             </div>
           </div>
