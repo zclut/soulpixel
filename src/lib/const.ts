@@ -12,11 +12,11 @@ export const COOLDOWN_DURATION = 15 // seconds
 
 
 export const LEVEL = {
-    ECHO:        { text: "Echo", color: "text-purple-500", pixels: 0 },
-    AWAKENING:   { text: "Awakening", color: "text-blue-500", pixels: 10 },
-    SPIRIT:      { text: "Spirit", color: "text-fuchsia-500", pixels: 500 },
-    ASCENDED:    { text: "Ascended", color: "text-pink-500", pixels: 1000 },
-    ETERNAL:     { text: "Eternal", color: "text-yellow-500", pixels: 5000 },
+    ECHO:        { text: "ECHO", color: "text-purple-500", pixels: 0 },
+    AWAKENING:   { text: "AWAKENING", color: "text-blue-500", pixels: 10 },
+    SPIRIT:      { text: "SPIRIT", color: "text-fuchsia-500", pixels: 500 },
+    ASCENDED:    { text: "ASCENDED", color: "text-pink-500", pixels: 1000 },
+    ETERNAL:     { text: "ETERNAL", color: "text-yellow-500", pixels: 5000 },
 }
 
 export const COLORS = [

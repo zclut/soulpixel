@@ -18,17 +18,26 @@ export default function useIsLevelUp() {
   const $userPixelCounts = useStore(userPixelCounts);
   const userCount = $userPixelCounts.get(you.username) || null;
   const prevLevelRef = useRef<any>(null);
-  
+
+
   useEffect(() => {
     if (!userCount) return;
     const newLevel = getLevelFromPixels(userCount == null ? 0 : userCount);
     const prevLevel = prevLevelRef.current
     prevLevelRef.current = newLevel
 
-    if (newLevel && prevLevel && prevLevel.text !== newLevel.text && userCount > 0) { 
-      toast(`🎉 Nivel alcanzado: ${newLevel?.text}`, {
-        icon: <Trophy className="text-yellow-400" />,
-        className: `!bg-gray-900/50 ${`!${newLevel?.color}`}`,
+    const levelUp = newLevel && prevLevel && newLevel.text !== prevLevel.text && newLevel.pixels > prevLevel.pixels;
+    const levelDown = newLevel && prevLevel && newLevel.text !== prevLevel.text && newLevel.pixels < prevLevel.pixels;
+    if (levelUp || levelDown) {
+      const content = 
+      <div>
+        <strong>{levelUp ? 'Your soul has ascended to: ' : 'Your soul has dimmed into: '}</strong>
+        <span className={`${newLevel.color}`}>{newLevel.text}</span>
+      </div>
+      
+      const trophyColor = levelUp ? 'text-yellow-400' : 'text-amber-700';
+      toast(content, {
+        icon: <Trophy className={trophyColor} />,
       });
     }
   }, [userCount]);
