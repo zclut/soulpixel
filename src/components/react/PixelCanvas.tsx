@@ -263,6 +263,11 @@ export default function PixelCanvas({
       });
 
       try {
+        const pixel = $grid.get(key);
+        if (pixel && pixel.user === username && pixel.color === activeColor) {
+          setCooldown(0);
+          return;
+        }
         await insertPixel(x, y, activeColor);
         setCooldown(defaultCooldown);
       } catch (error) {
