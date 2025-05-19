@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useStore } from "@nanostores/react";
 import { feedList, selectedColor } from "@/store";
@@ -14,6 +14,12 @@ export default function Feed({ username }: Props) {
   const handleOnSelectColor = (color: string) => {
     selectedColor.set(color);
   };
+
+  useEffect(() => {
+    if ($feedList.length > 50) {
+      $feedList.pop();
+    }
+  }, [$feedList])
 
   return (
     <>
