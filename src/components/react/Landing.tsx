@@ -76,23 +76,23 @@ export default function LandingPage() {
           transition={{ delay: 4, duration: 0.8 }}
           className="relative"
         >
-          <div className="absolute -inset-1 bg-gradient-to-r from-purple-600/30 to-violet-800/30 rounded-lg blur-lg group-hover:opacity-100 transition duration-1000 group-hover:duration-200 animate-pulse"></div>
+          <div className="absolute -inset-1 bg-gradient-to-r from-purple-600/30 to-violet-800/30 rounded-lg blur-lg group-hover:opacity-100 transition duration-500 group-hover:duration-200 animate-pulse"></div>
           <SignedOut>
             <SignInButton mode="modal">
-              <Button className="cursor-pointer relative group font-mono text-lg px-8 py-6 bg-transparent  border-purple-900/50 hover:border-purple-500/50 text-gray-300 hover:text-[#c4a9ff] transition-all duration-300 overflow-hidden">
-                <span className="relative z-10">Enter the Soul</span>
-                <span className="absolute inset-0 bg-gradient-to-r from-[#1e1e1e] to-[#2a0a3e] opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
-                <span className="absolute inset-0 bg-[#1a0a2e] opacity-0 group-hover:opacity-30 glitch-effect"></span>
+              <Button variant={"echo"} className="text-md font-mono cursor-pointer group">
+              <span className="relative z-10 group-hover:text-fuchsia-600">Enter the Soul</span>
+                <span className="absolute inset-0 bg-gradient-to-r from-[#1e1e1e] to-[#2a0a3e] opacity-0  transition-opacity duration-1000"></span>
+                <span className="absolute inset-0 bg-[#1a0a2e] opacity-0  glitch-effect"></span>
               </Button>
             </SignInButton>
           </SignedOut>
 
           <SignedIn>
             <a href="/soul">
-              <Button className="cursor-pointer relative group font-mono text-lg px-8 py-6 bg-transparent  border-purple-900/50 hover:border-purple-500/50 text-gray-300 hover:text-[#c4a9ff] transition-all duration-300 overflow-hidden">
-                <span className="relative z-10">Feed the Soul</span>
-                <span className="absolute inset-0 bg-gradient-to-r from-[#1e1e1e] to-[#2a0a3e] opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
-                <span className="absolute inset-0 bg-[#1a0a2e] opacity-0 group-hover:opacity-30 glitch-effect"></span>
+              <Button variant={"echo"} className="text-md font-mono cursor-pointer group">
+                <span className="relative z-10 group-hover:text-fuchsia-600">Feed the Soul</span>
+                <span className="absolute inset-0 bg-gradient-to-r from-[#1e1e1e] to-[#2a0a3e] opacity-0  transition-opacity duration-1000"></span>
+                <span className="absolute inset-0 bg-[#1a0a2e] opacity-0  glitch-effect"></span>
               </Button>
             </a>
           </SignedIn>
