@@ -31,10 +31,10 @@ const achievements: Achievement[] = [
   {
     id: 1,
     name: "GHOST TRACE",
-    description: "Manifest your first Soul. The echo begins.",
+    description: "Manifest your first 5 Souls. The echo begins.",
     icon: <Target className="h-5 w-5" />,
     progress: 0,
-    maxProgress: 1,
+    maxProgress: 5,
     unlocked: false,
     rarity: "common",
     type: TypeProgress.SOUL,

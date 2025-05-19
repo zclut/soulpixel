@@ -83,7 +83,7 @@ export const listenToGridChanges = (callback: Function, user_id: string) => {
         )
         .on(
             "postgres_changes",
-            { event: "*", schema: "public", table: "grid" },
+            { event: "INSERT", schema: "public", table: "grid" },
             (payload) => {
                 callback(payload.new);
                 addFeedStore(payload.new as any);

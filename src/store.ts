@@ -79,9 +79,12 @@ export const userStats = (userId: string) =>
     const totalSouls = userSoulsMap.get(userId) || 0;
 
     // Paso 3: calcular cuántos usuarios tienen más souls que él (para rank)
-    const rank =
-      1 +
-      Array.from(userSoulsMap.values()).filter((souls) => souls > totalSouls).length;
+
+    const allSouls = Array.from(userSoulsMap.values());
+
+    const rank = allSouls.length === 0
+      ? 4
+      : 1 + allSouls.filter((souls) => souls > totalSouls).length;
 
     // Paso 4: contar colores únicos del usuario
     const colorCountMap = new Map<string, number>();
