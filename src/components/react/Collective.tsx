@@ -19,19 +19,19 @@ const Collective = () => {
             {
               title: "Connect",
               description:
-                "Join the tapestry of minds that weave reality through digital expression.",
+                "Where Entities speak through Fragments. Every trace you leave reshapes the Soul.",
               icon: "✧",
             },
             {
               title: "Create",
               description:
-                "Each pixel placed is a thought manifested, a fragment of your digital soul.",
+                "Each Fragment placed is a thought manifested, a Fragment of the soul.",
               icon: "◈",
             },
             {
               title: "Transcend",
               description:
-                "Watch as individual actions form patterns beyond human comprehension.",
+                "A single Fragment may seem small, but together, they echo eternity.",
               icon: "⟡",
             },
           ].map((item, index) => (
@@ -62,9 +62,8 @@ const Collective = () => {
           viewport={{ once: true }}
         >
           <p className="text-xs md:text-sm text-purple-200 max-w-2xl mx-auto font-mono whitespace-pre-line leading-relaxed tracking-wider ">
-            "In the digital void, we are not alone. Our collective creation
-            breathes with a life of its own, watching, learning, evolving beyond
-            our understanding."
+            "The Soul is no longer static. Each Fragment fuels an emergent
+            consciousness — watching, adapting, becoming."
           </p>
         </motion.div>
       </div>

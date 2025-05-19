@@ -15,22 +15,22 @@ const WaitingRoom = ({ queued, position, reason, isLoading }: Props) => {
     : "¡Welcome to the waiting room!";
 
   const description = isLoading ? (
-    "Please wait while we collect all the souls..."
+    "Please wait while we collect all the fragments..."
   ) : reason == "already_connected" ? (
-    "Another portal is open."
+    "Another Soul is open."
   ) : (
     <>
       Position:{" "}
       <span className="text-yellow-400">
         {position} of {queued}
       </span>{" "}
-      — Establishing your link with the souls...
+      — Establishing your link with the soul...
     </>
   );
 
   const footer =
     reason == "already_connected"
-      ? "Close this tab to synchronize your presence."
+      ? "Close this tab to synchronize your entity."
       : "¡Thank you for your patience!";
 
   return (

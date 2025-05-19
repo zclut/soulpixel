@@ -7,8 +7,8 @@ export default function OnlineUsers() {
 
   return (
     <div className="flex items-center gap-1">
-      <Activity className="h-3 w-3"/> 
-      <span>CONNECTED SOULS: {$onlineUsers}</span>
+      <Activity className="h-3 w-3" />
+      <span>ENTITIES: {$onlineUsers}</span>
     </div>
   );
 }
