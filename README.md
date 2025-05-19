@@ -92,8 +92,8 @@ Este proyecto usa [Clerk](https://clerk.com) para:
 ## 📦 Instalación local
 
 ```bash
-git clone https://github.com/zclut/pixel
-cd pixel
+git clone https://github.com/zclut/soulpixel
+cd soulpixel
 
 # Configura variables de entorno para Supabase y Clerk
 cp .env.example .env
