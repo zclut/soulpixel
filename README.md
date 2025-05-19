@@ -35,10 +35,7 @@ Aquí, cada fragmento que colocas no solo es un color en un lienzo, es el **eco 
 
 #### Timelapse actual de SoulPixel
 
-<video width="640" height="360" autoplay loop muted playsinline>
-  <source src="https://soulpixel.klasinky.com/timelapse/timelapse.mp4" type="video/mp4">
-  Your browser does not support the video tag.
-</video>
+![Timelapse](https://github.com/user-attachments/assets/21cd7050-1f96-45cc-b8fb-4bf33dbdbc21)
 
 #### Grid Principal
 
