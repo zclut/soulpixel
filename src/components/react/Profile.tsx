@@ -33,7 +33,6 @@ const Profile = ({ username, cooldown }: Props) => {
     { id: 2, name: "RANK", value: level?.text.toUpperCase() },
     { id: 3, name: "SOULS", value: userCount },
     { id: 4, name: "ACHIEVEMENTS", value: userAchievements },
-    { id: 5, name: "COOLDOWN", value: cooldown > 0 ? getFormattedTime(cooldown) : "Place it!" },
   ];
 
   const PROFILE_STYLES = {
@@ -82,11 +81,14 @@ const Profile = ({ username, cooldown }: Props) => {
           </div>
         </div>
 
-        <div className="flex justify-between items-center text-xs">
+        <div className="flex justify-between items-center align-middle text-xs gap-2">
           <span className="inline-flex items-center gap-1 my-auto">
             <Copyright size={12} />
             <span>SOULPIXEL</span>
           </span>
+          <div className="flex items-center justify-center text-[0.8rem] px-4 text-yellow-500">
+            {cooldown > 0 ? getFormattedTime(cooldown) : "Place it!"}
+          </div>
           <OnlineUsers />
         </div>
       </div>
