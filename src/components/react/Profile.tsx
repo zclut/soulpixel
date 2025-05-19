@@ -7,6 +7,7 @@ import { getFormattedTime, getLevelFromPixels } from "@/lib/utils";
 import { getAchievementsUpToPixels } from "@/utils/achievements.utils";
 import useIsLevelUp from "@/hooks/useLevelUp";
 import useIsAchievements from "@/hooks/useIsAchievements";
+import TimelapseDialog from "@/components/react/TimelapseDialog";
 
 interface Props {
   username: string;
@@ -49,6 +50,9 @@ const Profile = ({ username, cooldown }: Props) => {
         <div className="text-sm tracking-wider flex items-center gap-2">
           <Info className="h-4 w-4" />
           PROFILE
+        </div>
+        <div>
+          <TimelapseDialog/>
         </div>
       </div>
       <div className="p-2">

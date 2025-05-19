@@ -1,5 +1,3 @@
-"use client";
-
 import { useState } from "react";
 import { motion } from "framer-motion";
 import {
@@ -18,7 +16,7 @@ export default function TimelapseDialog() {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button
-          className="bg-purple-700/40 text-white hover:bg-purple-900 border border-purple-900/50 rounded-sm text-xs h-8 w-full flex items-center justify-center gap-2 cursor-pointer"
+          className="bg-purple-700/40 text-white hover:bg-purple-900 border border-purple-900/50 rounded-sm text-xs h-5 w-full flex items-center justify-center gap-2 cursor-pointer"
           onClick={() => setOpen(true)}
         >
           Unfold the Soul’s Mind

@@ -4,8 +4,6 @@ import Feed from "@/components/react/Feed";
 import Profile from "@/components/react/Profile";
 import { TerminalIcon } from "lucide-react";
 import Achievement from "./Achievement";
-import { useState } from "react";
-import TimelapseDialog from "./TimelapseDialog";
 
 interface Props {
   user: any;
@@ -58,7 +56,6 @@ const RightPanel = ({ user, cooldown }: Props) => {
             </TabsContent>
           </div>
         </Tabs>
-        <TimelapseDialog />
       </div>
     </div>
   );
