@@ -5,9 +5,10 @@ import { feedList, selectedColor } from "@/store";
 
 interface Props {
   username: string;
+  handleGoToCoordinates: Function;
 }
 
-export default function Feed({ username }: Props) {
+export default function Feed({ username, handleGoToCoordinates }: Props) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const $feedList = useStore(feedList);
 
@@ -45,7 +46,9 @@ export default function Feed({ username }: Props) {
                     {`${feed.user}${username == feed.user ? " (you)" : ""}: `}
                   </span>
                   {feed.message}
-                  <span className="ml-1 text-yellow-500 ">
+                  <span
+                    onClick={() => handleGoToCoordinates(feed.x, feed.y, 1.5)}
+                    className="ml-1 text-yellow-500 hover:text-yellow-600 cursor-pointer">
                     ({feed.x} {feed.y})
                   </span>
                   <span

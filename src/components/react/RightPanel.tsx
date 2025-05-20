@@ -8,9 +8,10 @@ import Achievement from "./Achievement";
 interface Props {
   user: any;
   cooldown: number;
+  handleGoToCoordinates: Function;
 }
 
-const RightPanel = ({ user, cooldown }: Props) => {
+const RightPanel = ({ user, cooldown, handleGoToCoordinates }: Props) => {
   return (
     <div className="w-full md:w-96 h-full flex flex-col gap-2">
       <Profile username={user.username} cooldown={cooldown} />
@@ -46,7 +47,7 @@ const RightPanel = ({ user, cooldown }: Props) => {
 
           <div className="flex-2 overflow-hidden mb-10">
             <TabsContent value="feed" className="h-full">
-              <Feed username={user.username} />
+              <Feed username={user.username} handleGoToCoordinates={handleGoToCoordinates} />
             </TabsContent>
             <TabsContent value="leaderboard" className="h-full">
               <Leaderboard username={user.username} />

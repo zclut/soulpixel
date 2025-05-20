@@ -16,6 +16,9 @@ interface PixelCanvasProps {
   initialGrid: any[];
   cooldown: number;
   setCooldown: React.Dispatch<React.SetStateAction<number>>;
+  canvasRef?: React.RefObject<{
+    goToPixel: (x: number, y: number, zoomLevel?: number) => void;
+  } | null>;
 }
 
 export default function PixelCanvas({
@@ -24,8 +27,9 @@ export default function PixelCanvas({
   setCooldown,
   username,
   initialGrid,
+  canvasRef,
 }: PixelCanvasProps) {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const canvasRefInternal = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const $grid = useStore(grid);
   const [pendingPixels, setPendingPixels] = useState<Map<string, PixelInfo>>(
@@ -39,6 +43,11 @@ export default function PixelCanvas({
   const [lastPosition, setLastPosition] = useState({ x: 0, y: 0 });
   const [offset, setOffset] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(0.4);
+  const [highlightedPixel, setHighlightedPixel] = useState<{
+    x: number;
+    y: number;
+    timestamp: number;
+  } | null>(null);
 
   const [isTouchDevice, setIsTouchDevice] = useState(false);
   const [touchMode, setTouchMode] = useState<"draw" | "move">("draw");
@@ -73,7 +82,7 @@ export default function PixelCanvas({
   }, []);
 
   const drawCanvas = () => {
-    const canvas = canvasRef.current;
+    const canvas = canvasRefInternal.current;
     if (!canvas) return;
 
     const ctx = canvas.getContext("2d");
@@ -165,6 +174,42 @@ export default function PixelCanvas({
       );
     }
 
+    // Dibujar el pixel resaltado si existe
+    if (highlightedPixel) {
+      const elapsedTime = Date.now() - highlightedPixel.timestamp;
+      if (elapsedTime < 2000) {
+        // Calcular la opacidad basada en el tiempo transcurrido (fade out)
+        const opacity = 1 - elapsedTime / 2000;
+
+        // Dibujar un borde pulsante alrededor del pixel
+        const pulseSize = 1 + Math.sin(elapsedTime / 100) * 0.2;
+
+        ctx.save();
+        ctx.strokeStyle = `rgba(255, 255, 0, ${opacity})`;
+        ctx.lineWidth = (3 / zoom) * pulseSize;
+
+        // Dibujar un borde más grande alrededor del pixel
+        const padding = 2 / zoom;
+        ctx.strokeRect(
+          highlightedPixel.x * CELL_SIZE - padding,
+          highlightedPixel.y * CELL_SIZE - padding,
+          CELL_SIZE + padding * 2,
+          CELL_SIZE + padding * 2
+        );
+
+        // Dibujar un segundo borde para efecto de resplandor
+        ctx.strokeStyle = `rgba(255, 165, 0, ${opacity * 0.7})`;
+        ctx.lineWidth = (5 / zoom) * pulseSize;
+        ctx.strokeRect(
+          highlightedPixel.x * CELL_SIZE - padding * 2,
+          highlightedPixel.y * CELL_SIZE - padding * 2,
+          CELL_SIZE + padding * 4,
+          CELL_SIZE + padding * 4
+        );
+        ctx.restore();
+      }
+    }
+
     ctx.restore();
   };
 
@@ -172,18 +217,26 @@ export default function PixelCanvas({
     return (
       x >= CANVAS_LIMITS.minX &&
       x <= CANVAS_LIMITS.maxX &&
-      y >= CANVAS_LIMITS.minY &&
-      y <= CANVAS_LIMITS.maxY
+      y <= CANVAS_LIMITS.maxY &&
+      y >= CANVAS_LIMITS.minY
     );
   };
 
   useEffect(() => {
     drawCanvas();
-  }, [$grid, pendingPixels, hoveredCell, offset, zoom, touchMode]);
+  }, [
+    $grid,
+    pendingPixels,
+    hoveredCell,
+    offset,
+    zoom,
+    touchMode,
+    highlightedPixel,
+  ]);
 
   useEffect(() => {
     const handleResize = () => {
-      const canvas = canvasRef.current;
+      const canvas = canvasRefInternal.current;
       const container = containerRef.current;
       if (!canvas || !container) return;
 
@@ -224,7 +277,7 @@ export default function PixelCanvas({
   }, []);
 
   const clientToGrid = (clientX: number, clientY: number) => {
-    const canvas = canvasRef.current;
+    const canvas = canvasRefInternal.current;
     if (!canvas) return null;
 
     const rect = canvas.getBoundingClientRect();
@@ -343,7 +396,7 @@ export default function PixelCanvas({
     const delta = -e.deltaY * 0.001;
     const newZoom = Math.max(0.1, Math.min(10, zoom + delta * zoom));
 
-    const rect = canvasRef.current?.getBoundingClientRect();
+    const rect = canvasRefInternal.current?.getBoundingClientRect();
     if (!rect) return;
 
     const mouseX = e.clientX - rect.left;
@@ -474,7 +527,7 @@ export default function PixelCanvas({
   };
 
   const downloadCanvas = () => {
-    const canvas = canvasRef.current;
+    const canvas = canvasRefInternal.current;
     if (!canvas) return;
 
     const tempCanvas = document.createElement("canvas");
@@ -521,6 +574,47 @@ export default function PixelCanvas({
     link.click();
   };
 
+  const goToPixel = (x: number, y: number, zoomLevel = 5) => {
+    // Verificar que las coordenadas estén dentro de los límites
+    if (!isWithinLimits(x, y)) {
+      console.warn(`Coordenadas (${x}, ${y}) fuera de los límites del canvas`);
+      return;
+    }
+
+    // Centrar en las coordenadas
+    const canvas = canvasRefInternal.current;
+    if (!canvas) return;
+
+    // Establecer el zoom
+    setZoom(zoomLevel);
+
+    // Centrar en el pixel (offset negativo porque movemos el canvas)
+    setOffset({
+      x: -x * CELL_SIZE * zoomLevel,
+      y: -y * CELL_SIZE * zoomLevel,
+    });
+
+    // Establecer el pixel como resaltado con timestamp actual
+    setHighlightedPixel({
+      x,
+      y,
+      timestamp: Date.now(),
+    });
+
+    // Limpiar el resaltado después de 2 segundos
+    setTimeout(() => {
+      setHighlightedPixel(null);
+    }, 2000);
+  };
+
+  useEffect(() => {
+    if (canvasRef) {
+      canvasRef.current = {
+        goToPixel,
+      };
+    }
+  }, [canvasRef]);
+
   return (
     <div
       ref={containerRef}
@@ -528,7 +622,7 @@ export default function PixelCanvas({
       style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0 }}
     >
       <canvas
-        ref={canvasRef}
+        ref={canvasRefInternal}
         onMouseMove={handleCanvasMouseMove}
         onMouseDown={handleCanvasMouseDown}
         onMouseUp={handleCanvasMouseUp}

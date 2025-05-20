@@ -3,7 +3,7 @@ import { getCooldownRemaining } from "@/lib/utils";
 import { getCurrentGrid, getLastPixelPlaced } from "@/services/api";
 import { selectedColor } from "@/store";
 import { useQueue } from "@/hooks/useQueue";
-import { useState, useSyncExternalStore, useEffect } from "react";
+import { useState, useSyncExternalStore, useEffect, useRef } from "react";
 import { useStore } from "@nanostores/react";
 import Footer from "@/components/Footer";
 import PixelCanvas from "@/components/react/PixelCanvas";
@@ -24,6 +24,16 @@ export default function Panel() {
   const [cooldown, setCooldown] = useState(0);
   const [initialGrid, setInitialGrid] = useState<any[]>([]);
   const [loadingData, setLoadingData] = useState(true);
+  const pixelCanvasRef = useRef<{
+    goToPixel: (x: number, y: number, zoomLevel?: number) => void
+  }>(null)
+
+  const handleGoToCoordinates = (x:number, y:number, zoom:number) => {
+    if (pixelCanvasRef.current) {
+      pixelCanvasRef.current.goToPixel(x, y, zoom)
+    }
+  }
+
   const isMobile = useIsMobile();
   const { inQueue, position, queued, reason, isReady, connectionFailed } = useQueue(you?.id!);
   const isAdmin = useIsAdmin();
@@ -75,7 +85,7 @@ export default function Panel() {
           {/* Main Content */}
           {isMobile && (
             <div className="flex flex-col md:h-[calc(100vh-49px)] h-[60vh] p-2">
-              <RightPanel user={you} cooldown={cooldown} />
+              <RightPanel user={you} cooldown={cooldown} handleGoToCoordinates={handleGoToCoordinates} />
             </div>
           )}
 
@@ -88,11 +98,12 @@ export default function Panel() {
                 setCooldown={setCooldown}
                 activeColor={$selectedColor}
                 username={you?.username!}
+                canvasRef={pixelCanvasRef}
               />
             </div>
 
             {/* Right Panel  */}
-            {!isMobile && <RightPanel user={you} cooldown={cooldown} />}
+            {!isMobile && <RightPanel user={you} cooldown={cooldown} handleGoToCoordinates={handleGoToCoordinates} />}
           </div>
 
           <Footer
