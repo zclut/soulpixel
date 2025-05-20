@@ -8,6 +8,7 @@ import { getAchievementsUpToPixels } from "@/utils/achievements.utils";
 import useIsLevelUp from "@/hooks/useLevelUp";
 import useIsAchievements from "@/hooks/useIsAchievements";
 import TimelapseDialog from "@/components/react/TimelapseDialog";
+import RankInfo from "./RankInfo";
 
 interface Props {
   username: string;
@@ -86,7 +87,10 @@ const Profile = ({ username, cooldown }: Props) => {
                     PROFILE_STYLES[name as keyof typeof PROFILE_STYLES].color
                   } truncate font-mono text-xs`}
                 >
-                  {value}
+                  <div className="flex items-center gap-2">
+                    {value}
+                    { id == 2 && <RankInfo /> }
+                  </div>
                 </span>
               </div>
             ))}
