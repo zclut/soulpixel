@@ -31,7 +31,7 @@ const achievements: Achievement[] = [
   {
     id: 1,
     name: "GHOST TRACE",
-    description: "Manifest your first 5 Souls. The echo begins.",
+    description: "Manifest your first 5 Fragments. The echo begins.",
     icon: <Target className="h-5 w-5" />,
     progress: 0,
     maxProgress: 5,
@@ -42,7 +42,7 @@ const achievements: Achievement[] = [
   {
     id: 2,
     name: "GRIDLING",
-    description: "Release 100 Souls into existence. Your signal gains clarity.",
+    description: "Release 100 Fragments into existence. Your signal gains clarity.",
     icon: <Grid className="h-5 w-5" />,
     progress: 0,
     maxProgress: 100,
@@ -53,7 +53,7 @@ const achievements: Achievement[] = [
   {
     id: 3,
     name: "SOUL LINKED",
-    description: "500 is the magic number. Your Soul resonates with the grid.",
+    description: "500 is the magic number. Your entity resonates with the soul.",
     icon: <Clock className="h-5 w-5" />,
     progress: 0,
     maxProgress: 500,
@@ -76,7 +76,7 @@ const achievements: Achievement[] = [
   {
     id: 5,
     name: "SOUL WARD",
-    description: "Embrace the soul. 2000 souls are your shield.",
+    description: "Embrace the soul. 2000 Fragments are your shield.",
     icon: <Shield className="h-5 w-5" />,
     progress: 0,
     maxProgress: 2000,
@@ -87,7 +87,7 @@ const achievements: Achievement[] = [
   {
     id: 6,
     name: "NEON VOICE",
-    description: "Reach the top 3. Your Soul resonates across dimensions.",
+    description: "Reach the top 3. Your entity resonates across dimensions.",
     icon: <Users className="h-5 w-5" />,
     progress: 0,
     maxProgress: 1,
@@ -98,7 +98,7 @@ const achievements: Achievement[] = [
   {
     id: 7,
     name: "SOUL ARCHITECT",
-    description: "Manifest 10,000 Souls. You shape the digital beyond.",
+    description: "Manifest 10,000 Fragments. The soul echoes with your Entity's will.",
     icon: <Award className="h-5 w-5" />,
     progress: 0,
     maxProgress: 10000,
