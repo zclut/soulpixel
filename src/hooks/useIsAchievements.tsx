@@ -25,10 +25,10 @@ export default function useIsLevelUp() {
       text: true,
     });
     toast(
-      <div>
+      <div className="font-mono">
         <strong>{title}</strong>
         <span className={color}>{achievement.name}</span>
-        <div className="text-sm text-muted-foreground">
+        <div className="text-xs text-muted-foreground">
           {achievement.description}
         </div>
       </div>,

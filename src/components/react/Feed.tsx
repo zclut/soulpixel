@@ -2,6 +2,8 @@ import { useEffect, useRef } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useStore } from "@nanostores/react";
 import { feedList, selectedColor } from "@/store";
+import { toast } from "sonner";
+import { Square } from "lucide-react";
 
 interface Props {
   username: string;
@@ -13,6 +15,12 @@ export default function Feed({ username, handleGoToCoordinates }: Props) {
   const $feedList = useStore(feedList);
 
   const handleOnSelectColor = (color: string) => {
+    if (color !== selectedColor.get()) {
+      toast("Color selected", {
+        icon: <Square fill={color} className={`h-5 w-5 text-gray-800`} />,
+        className: "!w-[160px] font-mono",
+      });
+    }
     selectedColor.set(color);
   };
 
